@@ -1,0 +1,25 @@
+[profile.default]
+src = "contracts"
+out = "out"
+libs = ["lib"]
+optimizer = true
+optimizer_runs = 200
+viaIR = true
+remappings = [
+    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+    "forge-std/=lib/forge-std/src/",
+]
+
+# Base Sepolia deployment profile
+[profile.base_sepolia]
+extends = "default"
+eth_rpc_url = "https://base-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY:-https://sepolia.base.org}"
+chain_id = 84532
+
+[fmt]
+line_length = 100
+tab_width = 4
+bracket_spacing = false
+int_types = "long"
+multiline_func_header = "params_first"
+quote_style = "double"

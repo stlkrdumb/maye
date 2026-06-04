@@ -1,0 +1,46 @@
+{
+  "name": "maye",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "compile": "forge build",
+    "test": "forge test --via-ir -v",
+    "test:foundry": "forge test --via-ir",
+    "deploy:dry-run": "bash -c 'source .env && forge script scripts/foundry/Deploy.s.sol --rpc-url $NEXT_PUBLIC_RPC_URL'",
+    "deploy:base-sepolia": "bash -c 'source .env && forge script scripts/foundry/Deploy.s.sol --rpc-url $NEXT_PUBLIC_RPC_URL --broadcast --verify --etherscan-api-key $BASESCAN_API_KEY'",
+    "setup:pool": "bash -c 'source .env && forge script scripts/foundry/SetupPool.s.sol --rpc-url $NEXT_PUBLIC_RPC_URL --broadcast'",
+    "verify:all": "bash -c 'source .env && forge script scripts/foundry/VerifyAll.s.sol --rpc-url $NEXT_PUBLIC_RPC_URL --verify --etherscan-api-key $BASESCAN_API_KEY'"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.5.0",
+    "@rainbow-me/rainbowkit": "^2.2.0",
+    "@reclaimprotocol/js-sdk": "^5.4.1",
+    "@tanstack/react-query": "^5.60.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.16.0",
+    "next": "16.2.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "shadcn": "^4.8.0",
+    "tailwind-merge": "^3.6.0",
+    "tw-animate-css": "^1.4.0",
+    "viem": "^2.21.0",
+    "wagmi": "^2.14.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

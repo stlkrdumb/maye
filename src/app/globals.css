@@ -1,0 +1,385 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark, .dark *));
+
+/* ============================================================
+   Maye — Design Tokens & CSS Custom Properties
+   Editorial Minimalism: Warm, grounded financial aesthetic
+   ============================================================ */
+
+@layer theme {
+  :root {
+    /* ---- Color Palette (WCAG AA compliant) ---- */
+    --color-sage: #a9ddd3;
+    --color-sage-dark: #8cc4b8;
+    --color-sage-light: #d4eee8;
+    --color-sage-text: #2d6a5f;  /* For text on light backgrounds - 4.5:1+ */
+    --color-bone: #e8e3d5;
+    --color-bone-dark: #d4cfc0;
+    --color-ink: #010101;
+    --color-ink-muted: #2a2a27;
+    --color-warm-gray: #6b6560;  /* Darkened from #9e9a91 for 4.5:1 contrast */
+    --color-warm-gray-light: #8a8580;  /* Darkened for better readability */
+    --color-white: #fdfcfa;
+
+    /* ---- Semantic Colors ---- */
+    --background: var(--color-white);
+    --foreground: var(--color-ink);
+
+    /* ---- Spacing Scale (semantic) ---- */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 12px;
+    --space-base: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    --space-3xl: 64px;
+    --space-4xl: 96px;
+
+    /* ---- Radii ---- */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+
+    /* ---- Typography ---- */
+    --font-display: "Suisse Intl", "Newsreader", serif;
+    --font-body: "General Sans", "Inter", sans-serif;
+    --font-mono: "JetBrains Mono", monospace;
+
+    /* ---- Font Size Scale (rem) ---- */
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+    --text-5xl: 3rem;
+
+    /* ---- Transition ---- */
+    --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-base: 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+.dark {
+    /* ---- Color Palette (dark mode) ---- */
+    --color-sage: #8cc4b8;
+    --color-sage-dark: #a9ddd3;
+    --color-sage-light: #1a2f29;
+    --color-sage-text: #a9ddd3;
+    --color-bone: #1a1a18;
+    --color-bone-dark: #2a2a27;
+    --color-ink: #e8e3d5;
+    --color-ink-muted: #a09c94;
+    --color-warm-gray: #8a8580;
+    --color-warm-gray-light: #6b6560;
+    --color-white: #0f0f0e;
+}
+
+@layer base {
+  @font-face {
+    font-family: "Suisse Intl";
+    src: url("https://cdn.jsdelivr.net/fontsource/fonts/suisse-intl@latest/latin-400-normal.woff") format("woff");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Suisse Intl";
+    src: url("https://cdn.jsdelivr.net/fontsource/fonts/suisse-intl@latest/latin-600-normal.woff") format("woff");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Newsreader";
+    src: url("https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,600;1,400&display=swap");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "General Sans";
+    src: url("https://cdn.jsdelivr.net/fontsource/fonts/general-sans@latest/latin-400-normal.woff") format("woff");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "General Sans";
+    src: url("https://cdn.jsdelivr.net/fontsource/fonts/general-sans@latest/latin-600-normal.woff") format("woff");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "JetBrains Mono";
+    src: url("https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-400-normal.woff") format("woff");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    @apply bg-background text-foreground;
+  }
+
+  /* Selection color */
+  ::selection {
+    background-color: var(--color-sage-light);
+    color: var(--color-ink);
+  }
+
+  .dark ::selection {
+    background-color: var(--color-sage-light, #1a2f29);
+    color: var(--color-bone, #e8e3d5);
+  }
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+
+  /* ---- Hide Number Input Arrows ---- */
+  /* Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+  }
+
+  /* Firefox */
+  input[type=number] {
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
+  }
+}
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: var(--space-lg);
+  max-width: 1200px;
+}
+
+@utility heading-display {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+@utility heading-2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  font-weight: 600;
+}
+
+@utility heading-3 {
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+@utility text-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-warm-gray);
+}
+
+/* ---- Card Base ---- */
+@utility card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+  box-shadow: var(--glass-shadow);
+}
+
+/* ---- Input Base (light) ---- */
+@utility input-field {
+  width: 100%;
+  padding: var(--space-sm) var(--space-base);
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--foreground);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--ring);
+  }
+
+  &::placeholder {
+    color: var(--muted-foreground);
+    opacity: 0.5;
+  }
+}
+
+/* ---- Scroll Entry Animation ---- */
+@utility fade-up {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Reduced Motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .fade-up {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  /* ---- Light theme (Maye brand → shadcn semantic tokens) ---- */
+  --background: #fdfcfa;
+  --foreground: #010101;
+  --card: #fdfcfa;
+  --card-foreground: #010101;
+  --popover: #fdfcfa;
+  --popover-foreground: #010101;
+  --primary: #010101;
+  --primary-foreground: #fdfcfa;
+  --secondary: #f4f2ee;
+  --secondary-foreground: #010101;
+  --muted: #f4f2ee;
+  --muted-foreground: #6b6560;
+  --accent: #d4eee8;
+  --accent-foreground: #2d6a5f;
+  --destructive: #dc2626;
+  --destructive-foreground: #fdfcfa;
+  --border: rgba(1, 1, 1, 0.08);
+  --input: rgba(1, 1, 1, 0.08);
+  --ring: #a9ddd3;
+  --radius: 0.6rem;
+
+  /* Glass Effects */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(1, 1, 1, 0.04);
+  --glass-shadow: 0 8px 32px 0 rgba(1, 1, 1, 0.02);
+}
+
+.dark {
+  /* ---- Dark theme (inverted Maye palette) ---- */
+  --background: #0a0a09;
+  --foreground: #e8e3d5;
+  --card: #121211;
+  --card-foreground: #e8e3d5;
+  --popover: #121211;
+  --popover-foreground: #e8e3d5;
+  --primary: #e8e3d5;
+  --primary-foreground: #0a0a09;
+  --secondary: #1e1e1c;
+  --secondary-foreground: #e8e3d5;
+  --muted: #1e1e1c;
+  --muted-foreground: #a09c94;
+  --accent: #1a2f29;
+  --accent-foreground: #a9ddd3;
+  --destructive: #7f1d1d;
+  --destructive-foreground: #e8e3d5;
+  --border: rgba(232, 227, 213, 0.1);
+  --input: rgba(232, 227, 213, 0.1);
+  --ring: #8cc4b8;
+
+  /* Glass Effects */
+  --glass-bg: rgba(18, 18, 17, 0.7);
+  --glass-border: rgba(232, 227, 213, 0.06);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+@keyframes toast-slide-in {
+  from {
+    transform: translateY(1.5rem) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
