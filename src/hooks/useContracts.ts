@@ -26,6 +26,7 @@ import {
   MockRLOABI,
   TestUSDCABI,
 } from "@/lib/contracts/abis";
+import { erc20Abi } from "viem";
 import { getContractAddress } from "@/lib/contracts/addresses";
 import type { PoolConfig } from "@/types/contracts";
 
@@ -85,9 +86,11 @@ export function usePoolRead(address?: string) {
     query: { refetchInterval: 2000 },
   });
 
-  const usdcBalance = useBalance({
-    address: address ? (address as `0x${string}`) : undefined,
-    token: getUSDCAddress(baseSepolia.id) as `0x${string}`,
+  const usdcBalance = useReadContract({
+    address: getUSDCAddress(baseSepolia.id) as `0x${string}`,
+    abi: erc20Abi,
+    functionName: "balanceOf",
+    args: address ? [(address as `0x${string}`)] : undefined,
     query: { refetchInterval: 2000 },
   });
 
@@ -480,7 +483,7 @@ export function useRialoPoolRead(userAddress?: string) {
   // User USDC balance
   const usdcBalance = useReadContract({
     address: usdcAddr,
-    abi: MockRLOABI,
+    abi: TestUSDCABI,
     functionName: "balanceOf",
     args: userAddress ? [userAddress as `0x${string}`] : undefined,
     query: { refetchInterval: 2000 },

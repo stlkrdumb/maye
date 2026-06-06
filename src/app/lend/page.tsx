@@ -67,7 +67,7 @@ export default function LendPage() {
   const usdcBalRaw = pool.usdcBalance.data;
 
   // Derived Values
-  const usdcDisplay = usdcBalRaw ? formatPrettyUSDC(usdcBalRaw.value) : "0";
+  const usdcDisplay = usdcBalRaw ? formatPrettyUSDC(usdcBalRaw as bigint) : "0";
   const userDepositDisplay = userDeposit ? formatPrettyUSDC(userDeposit) : "0";
   const apy = configRaw ? bpsToPercent(configRaw[2]) : "—";
   const utilization = useMemo(() => {
@@ -152,7 +152,7 @@ export default function LendPage() {
   const setMax = () => {
     if (activeTab === "deposit") {
       if (usdcBalRaw) {
-        setAmount((Number(usdcBalRaw.value) / 1e6).toString());
+        setAmount((Number(usdcBalRaw as bigint) / 1e6).toString());
       }
     } else {
       if (userDeposit) {
