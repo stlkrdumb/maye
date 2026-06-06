@@ -37,12 +37,6 @@ export const DashboardSummary = ({ loanIds }: DashboardSummaryProps) => {
   return (
     <div className="mb-12 fade-up">
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-        <div className="space-y-1">
-          <Badge variant="outline" className="mb-2 py-1 px-3 border-[var(--border)] text-[var(--ink-muted)] uppercase tracking-widest font-mono text-[9px]">
-            Portfolio Overview
-          </Badge>
-        </div>
-        
         <div className="flex gap-4">
           <div className="bg-card/40 backdrop-blur-md border border-border/40 p-4 rounded-2xl hover:border-[var(--color-sage)]/20 transition-colors">
             <p className="text-[9px] font-mono text-muted-foreground uppercase tracking-widest mb-1">Portfolio Health</p>
