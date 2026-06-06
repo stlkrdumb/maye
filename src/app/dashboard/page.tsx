@@ -8,7 +8,8 @@ import {
   useRialoPoolRead,
   useRialoLoanDetails,
   useRialoRepayWrite,
-  useRialoFaucets
+  useRialoFaucets,
+  useUserLoans
 } from "@/hooks/useContracts";
 import { useToast } from "@/lib/providers/toast";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ import {
   Calendar,
   RefreshCw
 } from "lucide-react";
+import { DashboardSummary } from "@/components/dashboard/DashboardSummary";
 
 /* ── Helpers ────────────────────────────────────────────────── */
 
@@ -139,7 +141,12 @@ export default function DashboardPage() {
   const pool = useRialoPoolRead(address);
   const faucets = useRialoFaucets();
 
-  // ── Toast Notifications loop ──
+  // Loan IDs from contract
+  const loanIds = useUserLoans(address);
+  const userLoans = pool.userLoans.data as bigint[] | undefined;
+  const liveCredentials = (pool.credentials.data as readonly boolean[]) || [false, false, false, false, false];
+
+  // ── Toast Notifications ──
   const { success: showSuccess, error: showError, pending: showPending } = useToast();
 
   // Watch Faucet confirmations
@@ -152,9 +159,6 @@ export default function DashboardPage() {
       }
     }
   }, [faucets.rloHash, faucets.isRloSuccess]);
-
-  const userLoans = pool.userLoans.data as bigint[] | undefined;
-  const liveCredentials = (pool.credentials.data as readonly boolean[]) || [false, false, false, false, false];
 
   // Refresh balances when faucet transactions land
   useEffect(() => {
@@ -186,7 +190,6 @@ export default function DashboardPage() {
   // Count verified credentials for trust score
   const trustScore = useMemo(() => {
     const numVerified = liveCredentials.filter(Boolean).length;
-    // Base trust score starts at 500, +80 points per attestation, +100 bonus for combo
     return 500 + numVerified * 80 + (numVerified === 5 ? 100 : 0);
   }, [liveCredentials]);
 
@@ -261,6 +264,11 @@ export default function DashboardPage() {
           </div>
         </header>
 
+        {/* Dashboard Summary (Command Center) */}
+        {userLoans && userLoans.length > 0 && (
+          <DashboardSummary loanIds={userLoans} />
+        )}
+
         {/* Dashboard Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           
@@ -304,12 +312,10 @@ export default function DashboardPage() {
           <div className="space-y-8">
             {/* ZK DNA Score Card */}
             <Card className="relative overflow-hidden border border-border/40 bg-gradient-to-br from-[var(--glass-bg)] to-[var(--glass-bg)]/60 shadow-lg backdrop-blur-md group hover:shadow-xl hover:shadow-[var(--color-sage)]/5 hover:border-[var(--color-sage)]/20 transition-all duration-500">
-              {/* A beautiful glowing orb in the corner to represent ZK / cryptographic reputation energy */}
               <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-[var(--color-sage)]/10 blur-3xl pointer-events-none group-hover:bg-[var(--color-sage)]/20 transition-all duration-700" />
               <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-sage)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
               
               <CardContent className="p-8 space-y-6 relative">
-                {/* Top Row: Title & Badge */}
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-2">
                     <div className="p-1.5 rounded-md bg-[var(--color-sage-light)] text-[var(--color-sage-text)] dark:bg-[var(--color-sage-light)]/20 dark:text-[var(--color-sage)] animate-pulse shadow-[0_0_8px_rgba(169,221,211,0.2)]">
@@ -320,7 +326,6 @@ export default function DashboardPage() {
                     </span>
                   </div>
                   
-                  {/* Sleek pill badge */}
                   <div className={`px-2.5 py-0.5 rounded-full border text-[9px] font-mono font-bold tracking-widest uppercase flex items-center gap-1.5 shrink-0 transition-colors duration-500 ${
                     trustScore >= 850 
                       ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30"
@@ -339,7 +344,6 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 
-                {/* Middle Row: Score Display */}
                 <div className="py-2 space-y-1">
                   <div className="flex items-baseline gap-2">
                     <span className="text-6xl font-bold tracking-tighter text-foreground font-mono leading-none">
@@ -354,14 +358,12 @@ export default function DashboardPage() {
                   </p>
                 </div>
                 
-                {/* Bottom Row: Attestation Progress & Details */}
                 <div className="space-y-3 pt-4 border-t border-border/30">
                   <div className="flex justify-between items-center text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
                     <span>Attestation Integrity</span>
                     <span className="text-foreground font-bold">{liveCredentials.filter(Boolean).length} / 5 Verified</span>
                   </div>
                   
-                  {/* Sleek glowing progress bar */}
                   <div className="relative h-2 bg-muted dark:bg-muted/50 rounded-full overflow-hidden border border-border/20">
                     <div 
                       className="absolute inset-y-0 left-0 bg-gradient-to-r from-[var(--color-sage-dark)] to-[var(--color-sage)] rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(169,221,211,0.5)]" 
@@ -437,11 +439,9 @@ function LoanPositionCard({ loanId, userAddress }: { loanId: bigint; userAddress
 
   const [now, setNow] = useState<bigint>(0n);
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setNow(BigInt(Math.floor(Date.now() / 1000)));
   }, []);
 
-  // Per-card transaction tracking — single-click auto-flow
   const [localApproveHash, setLocalApproveHash] = useState<`0x${string}` | undefined>(undefined);
   const [localRepayHash, setLocalRepayHash] = useState<`0x${string}` | undefined>(undefined);
   const [repaymentConfirmed, setRepaymentConfirmed] = useState(false);
@@ -453,7 +453,6 @@ function LoanPositionCard({ loanId, userAddress }: { loanId: bigint; userAddress
       if (repayWrite.isApproveSuccess) {
         showSuccess("Repayment Approved", "USDC authorized for loan settlement.", repayWrite.approveHash);
         setLocalApproveHash(undefined);
-        // Auto-trigger repayment immediately after approval
         setTimeout(async () => {
           try {
             setLocalRepayHash(undefined);
@@ -483,8 +482,6 @@ function LoanPositionCard({ loanId, userAddress }: { loanId: bigint; userAddress
     }
   }, [repayWrite.repayHash, repayWrite.isRepaySuccess, localRepayHash]);
 
-  const [refetchTrigger, setRefetchTrigger] = useState(0);
-
   // Refresh loan details when operations finalize
   useEffect(() => {
     if (repayWrite.isApproveSuccess) {
@@ -501,7 +498,6 @@ function LoanPositionCard({ loanId, userAddress }: { loanId: bigint; userAddress
     }
   }, [repayWrite.isRepaySuccess]);
 
-  // Helper: is this card currently waiting for its own tx to confirm?
   const isLocalApproving = localApproveHash !== undefined;
   const isLocalRepaying = localRepayHash !== undefined;
 
@@ -534,26 +530,23 @@ function LoanPositionCard({ loanId, userAddress }: { loanId: bigint; userAddress
   ] = ld;
 
   if (!isActive) {
-    return null; // Don't show settled loans
+    return null;
   }
 
   const isOverdue = now > 0n ? now > dueTime : false;
 
-  // Simple progress tracking (time elapsed / total loan duration)
   const totalDuration = dueTime - startTime;
   const elapsed = now > 0n ? now - startTime : 0n;
   const progressPercent = totalDuration > 0n 
     ? Math.min(100, Math.round((Number(elapsed) / Number(totalDuration)) * 100))
     : 0;
 
-  // Repayment USDC allowance verification — reactive to refetch
   const currentUsdcAllowance = (poolRead.usdcAllowance.data as bigint) || 0n;
   const needsApproval = repaymentRaw !== undefined && currentUsdcAllowance < repaymentRaw;
 
   const handleRepayLoan = async () => {
     try {
       setRepaymentError(undefined);
-      // If approval is needed, trigger approval first
       if (needsApproval) {
         const buffer = parseUnits("10", 6);
         setLocalApproveHash(undefined);
@@ -561,7 +554,6 @@ function LoanPositionCard({ loanId, userAddress }: { loanId: bigint; userAddress
         setLocalApproveHash(hash);
         return;
       }
-      // Approval already done, trigger repayment directly
       setLocalRepayHash(undefined);
       const hash = await repayWrite.repay(loanId);
       setLocalRepayHash(hash);
@@ -573,14 +565,11 @@ function LoanPositionCard({ loanId, userAddress }: { loanId: bigint; userAddress
 
   return (
     <Card className="border border-border/40 bg-gradient-to-br from-[var(--glass-bg)] to-[var(--glass-bg)]/70 backdrop-blur-md shadow-sm hover:shadow-xl hover:shadow-[var(--color-sage)]/5 hover:border-[var(--color-sage)]/20 transition-all duration-500 rounded-2xl overflow-hidden group">
-      {/* Subtle top accent line */}
       <div className="h-px w-full bg-gradient-to-r from-transparent via-[var(--color-sage)]/20 to-transparent" />
       
       <CardContent className="p-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          {/* Principal & APR readout */}
           <div className="flex items-center gap-5">
-            {/* Premium Dynamic Token Seal */}
             <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--color-sage-light)]/30 to-[var(--color-sage-light)]/10 border border-[var(--color-sage)]/20 flex flex-col items-center justify-center font-mono shrink-0 group-hover:scale-105 group-hover:border-[var(--color-sage)]/40 transition-all duration-500 shadow-sm">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[var(--color-sage)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <span className="relative z-10 text-[6px] uppercase tracking-[0.25em] text-[var(--color-sage-text)]/60 dark:text-[var(--color-sage)]/60 leading-none">ID</span>
@@ -619,7 +608,6 @@ function LoanPositionCard({ loanId, userAddress }: { loanId: bigint; userAddress
             </div>
           </div>
 
-          {/* Time Repayment progress bar */}
           <div className="flex flex-1 max-w-xs flex-col gap-2">
             <div className="flex justify-between items-center text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               <div className="flex items-center gap-1.5">
@@ -646,11 +634,9 @@ function LoanPositionCard({ loanId, userAddress }: { loanId: bigint; userAddress
             )}
           </div>
 
-          {/* Settle loan action button — single-click auto-flow */}
           <div className="shrink-0 flex flex-col items-end gap-1 self-end lg:self-center">
             {repaymentRaw !== undefined && (
               <>
-                {/* Progress status text */}
                 {isLocalApproving && (
                   <div className="flex items-center gap-1.5 text-[8px] font-mono uppercase tracking-wider text-[var(--color-sage)]">
                     <div className="h-1.5 w-1.5 rounded-full bg-[var(--color-sage)] animate-pulse" />
@@ -669,7 +655,6 @@ function LoanPositionCard({ loanId, userAddress }: { loanId: bigint; userAddress
                   </div>
                 )}
 
-                {/* Main action button */}
                 <Button 
                   size="sm" 
                   onClick={handleRepayLoan} 
