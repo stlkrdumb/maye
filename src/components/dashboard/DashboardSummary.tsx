@@ -41,7 +41,6 @@ export const DashboardSummary = ({ loanIds }: DashboardSummaryProps) => {
           <Badge variant="outline" className="mb-2 py-1 px-3 border-[var(--border)] text-[var(--ink-muted)] uppercase tracking-widest font-mono text-[9px]">
             Portfolio Overview
           </Badge>
-          <h2 className="heading-display">Your Command Center</h2>
         </div>
         
         <div className="flex gap-4">
