@@ -199,9 +199,14 @@ contract RialoLendingPoolTest is Test {
         uint256 borrowAmount = 100_000 * USDC_PRECISION; // $100k
         (uint256 collateralNeeded, ) = pool.computeCollateralNeeded(borrower, borrowAmount);
 
+        // Compute loan ID using same formula as contract: keccak256(borrower, amount, timestamp, loanCounter)
+        uint256 loanId;
         vm.startPrank(borrower);
         weth.approve(address(pool), collateralNeeded);
+        uint256 borrowTimestamp = block.timestamp;
+        uint256 borrowCounter = pool.loanCounter();
         pool.borrow(borrowAmount, 365 days);
+        loanId = uint256(keccak256(abi.encodePacked(borrower, borrowAmount, borrowTimestamp, borrowCounter)));
         vm.stopPrank();
 
         // Simulate 182.5 days passing (exactly half of the 365-day loan term)
@@ -209,19 +214,19 @@ contract RialoLendingPoolTest is Test {
 
         // Total outstanding should be Principal + (7.4% / 2 = 3.7% interest)
         // 3.7% of $100k is $3.7k -> Total = $103,700 USDC
-        uint256 repaymentAmount = pool.calculateRepaymentAmount(1);
+        uint256 repaymentAmount = pool.calculateRepaymentAmount(loanId);
         assertEq(repaymentAmount, 103_700 * USDC_PRECISION);
 
         // Repay loan
         vm.startPrank(borrower);
         usdc.mint(borrower, 3_700 * USDC_PRECISION); // Mint the accrued interest tokens
         usdc.approve(address(pool), repaymentAmount);
-        pool.repay(1);
+        pool.repay(loanId);
         vm.stopPrank();
 
         // Ensure borrower got back 100% of WETH collateral and loan is inactive
         assertEq(weth.balanceOf(borrower), 100 * WETH_PRECISION);
-        (,,,,,,,bool isActive) = pool.loans(1);
+        (,,,,,,,bool isActive) = pool.loans(loanId);
         assertFalse(isActive);
     }
 
@@ -233,38 +238,46 @@ contract RialoLendingPoolTest is Test {
         uint256 borrowAmount = 60_000 * USDC_PRECISION;
         (uint256 collateralNeeded, ) = pool.computeCollateralNeeded(borrower, borrowAmount);
 
+        uint256 loanId;
         vm.startPrank(borrower);
         weth.approve(address(pool), collateralNeeded);
+        uint256 borrowTimestamp = block.timestamp;
+        uint256 borrowCounter = pool.loanCounter();
         pool.borrow(borrowAmount, 30 days);
+        loanId = uint256(keccak256(abi.encodePacked(borrower, borrowAmount, borrowTimestamp, borrowCounter)));
         vm.stopPrank();
 
         vm.prank(liquidator);
         vm.expectRevert("Cannot liquidate");
-        pool.liquidate(1);
+        pool.liquidate(loanId);
     }
 
     function test_Liquidation_Succeeds_When_Overdue() public {
         uint256 borrowAmount = 60_000 * USDC_PRECISION;
         (uint256 collateralNeeded, ) = pool.computeCollateralNeeded(borrower, borrowAmount);
 
+        uint256 loanId;
         vm.startPrank(borrower);
         weth.approve(address(pool), collateralNeeded);
+        uint256 borrowTimestamp = block.timestamp;
+        uint256 borrowCounter = pool.loanCounter();
         pool.borrow(borrowAmount, 30 days);
+        loanId = uint256(keccak256(abi.encodePacked(borrower, borrowAmount, borrowTimestamp, borrowCounter)));
         vm.stopPrank();
 
         // Warp past dueTime (31 days)
         vm.warp(block.timestamp + 31 days);
 
-        uint256 repayDebt = pool.calculateRepaymentAmount(1);
+        uint256 repayDebt = pool.calculateRepaymentAmount(loanId);
 
         vm.startPrank(liquidator);
         usdc.approve(address(pool), repayDebt);
-        pool.liquidate(1);
+        pool.liquidate(loanId);
         vm.stopPrank();
 
         // Liquidator should receive all locked WETH collateral
         assertEq(weth.balanceOf(liquidator), collateralNeeded);
-        (,,,,,,,bool isActive) = pool.loans(1);
+        (,,,,,,,bool isActive) = pool.loans(loanId);
         assertFalse(isActive);
     }
 
@@ -278,9 +291,13 @@ contract RialoLendingPoolTest is Test {
         uint256 borrowAmount = 60_000 * USDC_PRECISION;
         (uint256 collateralNeeded, ) = pool.computeCollateralNeeded(borrower, borrowAmount);
 
+        uint256 loanId;
         vm.startPrank(borrower);
         weth.approve(address(pool), collateralNeeded);
+        uint256 borrowTimestamp = block.timestamp;
+        uint256 borrowCounter = pool.loanCounter();
         pool.borrow(borrowAmount, 30 days);
+        loanId = uint256(keccak256(abi.encodePacked(borrower, borrowAmount, borrowTimestamp, borrowCounter)));
         vm.stopPrank();
 
         // Crash WETH price from $3000 to $2000 (USDC/USD)
@@ -288,11 +305,11 @@ contract RialoLendingPoolTest is Test {
         vm.prank(owner);
         pool.setWethPrice(2000 * USDC_PRECISION);
 
-        uint256 repayDebt = pool.calculateRepaymentAmount(1);
+        uint256 repayDebt = pool.calculateRepaymentAmount(loanId);
 
         vm.startPrank(liquidator);
         usdc.approve(address(pool), repayDebt);
-        pool.liquidate(1);
+        pool.liquidate(loanId);
         vm.stopPrank();
 
         // Liquidator seized WETH at a deep discount

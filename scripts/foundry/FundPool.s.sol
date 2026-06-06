@@ -8,7 +8,7 @@ contract FundPool is Script {
     function run() public {
         uint256 deployerKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
         address pool = 0xFE3F04af1ad5c83740d731B06CA4316F13402C7a;
-        address usdcAddress = 0x4aadaE938D355b1F8E33ACa3cB3a2b3E8A8f6F27;
+        address usdcAddress = 0x19fc415Cd4c0C68981E40c4A9C7688CEc485C624;
 
         vm.startBroadcast(deployerKey);
         // Attempt to mint 1,000,000 USDC directly to the pool contract

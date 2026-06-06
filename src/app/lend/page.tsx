@@ -52,14 +52,14 @@ function StatBlock({ label, value, subvalue, loading }: {
   loading: boolean;
 }) {
   return (
-    <div className="flex flex-col">
-      <span className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase mb-2">{label}</span>
+    <div className="flex flex-col space-y-1.5">
+      <span className="text-[9px] font-mono tracking-[0.15em] uppercase text-muted-foreground/80 font-medium">{label}</span>
       {loading ? (
-        <div className="h-8 w-24 bg-muted animate-pulse rounded" />
+        <div className="h-8 w-24 bg-muted/50 animate-pulse rounded-lg" />
       ) : (
         <>
-          <span className="heading-3 !text-2xl text-foreground">{value}</span>
-          {subvalue && <span className="text-[10px] text-muted-foreground font-mono mt-1">{subvalue}</span>}
+          <span className="heading-3 !text-2xl text-foreground font-bold tracking-tight">{value}</span>
+          {subvalue && <span className="text-[10px] font-mono text-muted-foreground/70">{subvalue}</span>}
         </>
       )}
     </div>
@@ -265,48 +265,57 @@ export default function LendPage() {
 
         {/* Metrics Row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 fade-up" style={{ animationDelay: '50ms' }}>
-          <div className="flex items-start justify-between p-6 rounded-xl bg-[var(--glass-bg)] border border-border/40 shadow-sm hover:border-primary/10 hover:shadow-md transition-all duration-300 group">
-            <div className="flex flex-col">
-              <span className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase mb-2">Total Pool Size</span>
-              {poolStatsLoaded ? (
-                <span className="heading-3 !text-2xl text-foreground font-mono">{totalDeposits ? `$${formatPrettyUSDC(totalDeposits)}` : "$0"}</span>
-              ) : (
-                <div className="h-8 w-24 bg-muted animate-pulse rounded" />
-              )}
-              <span className="text-[10px] text-muted-foreground font-mono mt-1 opacity-60">Supplied Assets</span>
-            </div>
-            <div className="p-1 rounded-full border border-border/10 bg-background/50 backdrop-blur-sm shadow-sm group-hover:scale-105 transition-all duration-500 shrink-0">
-              <USDCLogo />
-            </div>
-          </div>
-
-          <div className="flex items-start justify-between p-6 rounded-xl bg-[var(--glass-bg)] border border-border/40 shadow-sm hover:border-primary/10 hover:shadow-md transition-all duration-300 group">
-            <div className="flex flex-col">
-              <span className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase mb-2">Current APY</span>
-              {poolStatsLoaded ? (
-                <span className="heading-3 !text-2xl text-foreground font-mono">{apy}</span>
-              ) : (
-                <div className="h-8 w-24 bg-muted animate-pulse rounded" />
-              )}
-              <span className="text-[10px] text-muted-foreground font-mono mt-1 opacity-60">Variable Rate</span>
-            </div>
-            <div className="p-1 rounded-full border border-border/10 bg-background/50 backdrop-blur-sm shadow-sm group-hover:scale-105 transition-all duration-500 shrink-0">
-              <Activity className="size-6 text-[var(--color-sage-text)] dark:text-[var(--color-sage)]" />
+          <div className="group/stat relative overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--glass-bg)] to-[var(--glass-bg)]/60 backdrop-blur-md border border-border/40 hover:border-[var(--color-sage)]/30 transition-all duration-500 hover:shadow-lg hover:-translate-y-0.5">
+            <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-sage)]/5 to-transparent opacity-0 group-hover/stat:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            <div className="relative z-10 flex items-start justify-between p-6">
+              <div className="flex flex-col space-y-1.5">
+                <span className="text-[9px] font-mono tracking-[0.15em] uppercase text-muted-foreground/80 font-medium">Total Pool Size</span>
+                {poolStatsLoaded ? (
+                  <span className="heading-3 !text-2xl text-foreground font-bold tracking-tight">{totalDeposits ? `$${formatPrettyUSDC(totalDeposits)}` : "$0"}</span>
+                ) : (
+                  <div className="h-8 w-24 bg-muted/50 animate-pulse rounded-lg" />
+                )}
+                <span className="text-[10px] font-mono text-muted-foreground/70">Supplied Assets</span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-[var(--color-sage-light)]/20 border border-[var(--color-sage)]/20 text-[var(--color-sage-text)] dark:text-[var(--color-sage)] group-hover/stat:scale-110 transition-all duration-300 shadow-sm">
+                <USDCLogo className="size-5" />
+              </div>
             </div>
           </div>
 
-          <div className="flex items-start justify-between p-6 rounded-xl bg-[var(--glass-bg)] border border-border/40 shadow-sm hover:border-primary/10 hover:shadow-md transition-all duration-300 group">
-            <div className="flex flex-col">
-              <span className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase mb-2">Pool Utilization</span>
-              {poolStatsLoaded ? (
-                <span className="heading-3 !text-2xl text-foreground font-mono">{utilization}%</span>
-              ) : (
-                <div className="h-8 w-24 bg-muted animate-pulse rounded" />
-              )}
-              <span className="text-[10px] text-muted-foreground font-mono mt-1 opacity-60">Active Capital Ratio</span>
+          <div className="group/stat relative overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--glass-bg)] to-[var(--glass-bg)]/60 backdrop-blur-md border border-border/40 hover:border-[var(--color-sage)]/30 transition-all duration-500 hover:shadow-lg hover:-translate-y-0.5">
+            <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-sage)]/5 to-transparent opacity-0 group-hover/stat:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            <div className="relative z-10 flex items-start justify-between p-6">
+              <div className="flex flex-col space-y-1.5">
+                <span className="text-[9px] font-mono tracking-[0.15em] uppercase text-muted-foreground/80 font-medium">Current APY</span>
+                {poolStatsLoaded ? (
+                  <span className="heading-3 !text-2xl text-foreground font-bold tracking-tight">{apy}</span>
+                ) : (
+                  <div className="h-8 w-24 bg-muted/50 animate-pulse rounded-lg" />
+                )}
+                <span className="text-[10px] font-mono text-muted-foreground/70">Variable Rate</span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-[var(--color-sage-light)]/20 border border-[var(--color-sage)]/20 text-[var(--color-sage-text)] dark:text-[var(--color-sage)] group-hover/stat:scale-110 transition-all duration-300 shadow-sm">
+                <Activity className="size-5" />
+              </div>
             </div>
-            <div className="p-1 rounded-full border border-border/10 bg-background/50 backdrop-blur-sm shadow-sm group-hover:scale-105 transition-all duration-500 shrink-0">
-              <TrendingUp className="size-6 text-amber-600 dark:text-amber-400" />
+          </div>
+
+          <div className="group/stat relative overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--glass-bg)] to-[var(--glass-bg)]/60 backdrop-blur-md border border-border/40 hover:border-[var(--color-sage)]/30 transition-all duration-500 hover:shadow-lg hover:-translate-y-0.5">
+            <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-sage)]/5 to-transparent opacity-0 group-hover/stat:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            <div className="relative z-10 flex items-start justify-between p-6">
+              <div className="flex flex-col space-y-1.5">
+                <span className="text-[9px] font-mono tracking-[0.15em] uppercase text-muted-foreground/80 font-medium">Pool Utilization</span>
+                {poolStatsLoaded ? (
+                  <span className="heading-3 !text-2xl text-foreground font-bold tracking-tight">{utilization}%</span>
+                ) : (
+                  <div className="h-8 w-24 bg-muted/50 animate-pulse rounded-lg" />
+                )}
+                <span className="text-[10px] font-mono text-muted-foreground/70">Active Capital Ratio</span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 group-hover/stat:scale-110 transition-all duration-300 shadow-sm">
+                <TrendingUp className="size-5" />
+              </div>
             </div>
           </div>
         </div>

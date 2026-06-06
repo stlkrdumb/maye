@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useTheme } from "@/lib/providers/theme";
+import { Sun, Moon } from "@phosphor-icons/react";
 
 function ThemeToggle() {
   const { theme, setTheme, isDark } = useTheme();
@@ -15,16 +16,9 @@ function ThemeToggle() {
       aria-label={`Switch to ${isDark ? "light" : "dark"} theme`}
     >
       {isDark ? (
-        /* Sun icon */
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="4" />
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-        </svg>
+        <Sun weight="duotone" size={20} />
       ) : (
-        /* Moon icon */
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-        </svg>
+        <Moon weight="duotone" size={20} />
       )}
     </button>
   );
@@ -33,8 +27,8 @@ function ThemeToggle() {
 export function Header() {
   return (
     <header className="fixed top-4 left-0 right-0 z-50 px-4 md:px-8">
-      <nav className="flex items-center justify-between h-14 px-6 max-w-7xl mx-auto bg-[color:var(--background)]/80 backdrop-blur-xl border border-[color:var(--border)] rounded-2xl shadow-sm">
-        <Link href="/" className="flex items-center gap-2 no-underline text-inherit group">
+      <nav className="flex items-center justify-between h-14 px-6 max-w-7xl mx-auto bg-[color:var(--background)]/80 backdrop-blur-xl border border-[color:var(--border)] rounded-2xl shadow-sm hover:shadow-md hover:border-[color:var(--border)]/50 transition-all duration-300">
+        <Link href="/" className="flex items-center gap-2.5 no-underline text-inherit group">
           <div className="relative size-7 transition-transform duration-300 group-hover:scale-110">
             <Image
               src="/logo.svg"
@@ -48,20 +42,24 @@ export function Header() {
         </Link>
 
         {/* Nav Links */}
-        <div className="hidden md:flex items-center gap-8">
-          <Link href="/lend" className="text-sm font-medium text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)] transition-colors duration-150 no-underline">
-            Lend
-          </Link>
-          <Link href="/apply" className="text-sm font-medium text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)] transition-colors duration-150 no-underline">
-            Borrow
-          </Link>
-          <Link href="/dashboard" className="text-sm font-medium text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)] transition-colors duration-150 no-underline">
-            Dashboard
-          </Link>
+        <div className="hidden md:flex items-center gap-1">
+          {[
+            { href: "/lend", label: "Lend" },
+            { href: "/apply", label: "Borrow" },
+            { href: "/dashboard", label: "Dashboard" }
+          ].map((link) => (
+            <Link 
+              key={link.href} 
+              href={link.href} 
+              className="relative px-4 py-2 text-sm font-medium text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)] transition-all duration-200 no-underline rounded-lg hover:bg-[color:var(--muted)]/50"
+            >
+              {link.label}
+            </Link>
+          ))}
         </div>
 
         {/* Right side: theme + wallet */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <ThemeToggle />
           <ConnectButton showBalance={false} chainStatus="icon" accountStatus="address" />
         </div>

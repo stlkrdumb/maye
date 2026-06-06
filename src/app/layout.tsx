@@ -22,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={cn("font-sans", geist.variable)} suppressHydrationWarning>
-      <body className="min-h-screen">
+      <body className="min-h-[100dvh]">
         {/* Skip to main content for keyboard/screen reader users */}
         <a
           href="#main-content"

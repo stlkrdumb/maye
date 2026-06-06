@@ -600,7 +600,7 @@ export function useRialoRepayWrite() {
   async function approveUsdc(amount: bigint) {
     return approveAsync({
       address: usdcAddr,
-      abi: MockRLOABI,
+      abi: TestUSDCABI,
       functionName: "approve",
       args: [poolAddr, amount],
     });

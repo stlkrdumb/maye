@@ -143,8 +143,12 @@ contract RialoLendingPool is Ownable, ReentrancyGuard {
         (uint256 collateralNeeded, uint256 ratio) = computeCollateralNeeded(msg.sender, amount);
         (, uint256 interestRate) = getBorrowingTerms(msg.sender);
 
+        // Generate unique loan ID via cryptographic hash to prevent redeploy collisions
+        uint256 loanId = uint256(
+            keccak256(abi.encodePacked(msg.sender, amount, block.timestamp, loanCounter))
+        );
         loanCounter++;
-        loans[loanCounter] = Loan({
+        loans[loanId] = Loan({
             borrower: msg.sender,
             borrowedAmount: amount,
             collateralLocked: collateralNeeded,
@@ -155,14 +159,14 @@ contract RialoLendingPool is Ownable, ReentrancyGuard {
             isActive: true
         });
 
-        userLoanIds[msg.sender].push(loanCounter);
+        userLoanIds[msg.sender].push(loanId);
 
         // Pull WETH collateral from borrower
         require(collateralToken.transferFrom(msg.sender, address(this), collateralNeeded), "Collateral transfer failed");
         // Push USDC borrowed amount to borrower
         require(lendingToken.transfer(msg.sender, amount), "USDC transfer failed");
 
-        emit LoanBorrowed(loanCounter, msg.sender, amount, collateralNeeded, ratio, interestRate, block.timestamp + duration);
+        emit LoanBorrowed(loanId, msg.sender, amount, collateralNeeded, ratio, interestRate, block.timestamp + duration);
     }
 
     /**

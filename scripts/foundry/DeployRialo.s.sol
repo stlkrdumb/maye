@@ -15,7 +15,7 @@ contract DeployRialo is Script {
     CredentialVerifier public verifier;
     RialoLendingPool public pool;
 
-    address public usdcAddress = 0x4aadaE938D355b1F8E33ACa3cB3a2b3E8A8f6F27; // Deployed TestUSDC on Base Sepolia
+    address public usdcAddress = 0x19fc415Cd4c0C68981E40c4A9C7688CEc485C624; // Deployed TestUSDC on Base Sepolia (no faucet)
 
     function setUp() public {}
 

@@ -143,8 +143,19 @@ export default function ApplyPage() {
       : [false, false, false, false, false];
   }, [poolRead.credentials.data]);
 
-  // Enclave / Attestation signing and contract posting states
+  const numVerified = useMemo(() => {
+    return liveCredentials.filter(Boolean).length;
+  }, [liveCredentials]);
+
+  const allVerified = numVerified === 5;
+
+  const handleUpdateAttestations = async () => {
+    await poolRead.credentials.refetch();
+  };
+
   const [attestingId, setAttestingId] = useState<number | null>(null);
+
+  // 2-Step borrow execution logic
   const verifierWrite = useCredentialVerifierWrite();
 
   // Mint faucet faucet writes
@@ -195,7 +206,7 @@ export default function ApplyPage() {
   useEffect(() => {
     if (faucets.rloHash) {
       if (faucets.isRloSuccess) {
-        showSuccess("RLO Minted!", "100,000 RLO collateral added to your wallet.", faucets.rloHash);
+        showSuccess("RLO Minted!", "10,000 RLO collateral added to your wallet.", faucets.rloHash);
       } else {
         showPending("Minting RLO Faucet", "Claiming test RLO from faucet...", faucets.rloHash);
       }
@@ -292,6 +303,8 @@ export default function ApplyPage() {
     }
   }, [borrowWrite.isApproveSuccess]);
 
+
+
   // 2-Step borrow execution logic
   const requiredRloRaw = parseUnits(pricingDetails.collateralRlo.toString(), 18);
   const currentRloAllowance = (poolRead.rloAllowance.data as bigint) || 0n;
@@ -316,7 +329,9 @@ export default function ApplyPage() {
     }
   };
 
-  const numVerified = liveCredentials.filter(Boolean).length;
+  
+
+
 
   return (
     <div className="min-h-screen pt-24 pb-24 px-4 md:px-8">
@@ -371,114 +386,126 @@ export default function ApplyPage() {
               </p>
             </header>
 
-            {/* Live Progress Bar */}
-            <Card className="border-none bg-[var(--glass-bg)] mb-8 p-6">
-              <div className="flex items-center justify-between mb-3 text-xs font-mono">
-                <span className="text-muted-foreground">ATTENSION INTEGRITY:</span>
-                <span className="font-bold text-[var(--color-sage-text)]">{numVerified} / 5 SECURED</span>
-              </div>
-              <div className="h-2 bg-[var(--bone)] rounded-full overflow-hidden flex">
-                <div
-                  className="h-full bg-[var(--color-sage-dark)] transition-all duration-700"
-                  style={{ width: `${(numVerified / 5) * 100}%` }}
-                />
-              </div>
-              {numVerified === 5 && (
-                <div className="mt-4 flex items-center gap-2 text-xs text-[var(--color-sage-text)] font-mono">
-                  <Sparkles className="size-4 animate-bounce" />
-                  <span>COMBO BONUS UNLOCKED: -5% collateral, -0.3% rate active!</span>
-                </div>
-              )}
-            </Card>
-
-            {/* List of 5 credentials */}
-            <div className="space-y-4 mb-10">
-              {CREDENTIAL_ITEMS.map((item) => {
-                const isVerified = liveCredentials[item.id];
-                const isCurrentAttesting = attestingId === item.id || (verifierWrite.isPending && attestingId === item.id);
-                const Icon = item.icon;
-
-                return (
-                  <Card
-                    key={item.id}
-                    className={`border transition-all duration-300 bg-[var(--glass-bg)] overflow-hidden ${
-                      isVerified
-                        ? "border-[var(--color-sage)]/40 shadow-sm"
-                        : "border-border hover:border-primary/20"
-                    }`}
-                  >
-                    <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="flex gap-4 items-start">
-                        <div
-                          className={`p-3 rounded-lg border transition-colors ${
-                            isVerified
-                              ? "bg-[var(--color-sage-light)]/40 border-[var(--color-sage)]/20 text-[var(--color-sage-text)]"
-                              : "bg-[var(--bone)] border-border text-muted-foreground"
-                          }`}
-                        >
-                          <Icon className="size-5" />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                            {item.title}
-                            {isVerified && (
-                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold font-mono tracking-widest bg-[var(--color-sage-light)] text-[var(--color-sage-text)] uppercase">
-                                SECURED ✓
-                              </span>
-                            )}
-                          </h4>
-                          <p className="text-xs text-muted-foreground mt-0.5 max-w-md">{item.description}</p>
-                          <p className="text-[10px] font-mono text-muted-foreground mt-1 opacity-55">
-                            Verify method: {item.method}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex sm:flex-col items-end gap-2 shrink-0 self-end sm:self-center">
-                        <div className="text-right">
-                          <span className="block text-[10px] font-mono font-bold text-[var(--color-sage-text)]">{item.collateralDiscount}</span>
-                          <span className="block text-[9px] font-mono text-muted-foreground">{item.rateDiscount}</span>
-                        </div>
-                        
-                        {!isVerified ? (
-                          <Button
-                            size="sm"
-                            disabled={attestingId !== null}
-                            onClick={() => handleVerifyCredential(item.id)}
-                            className="h-8 px-4 font-mono text-[9px] uppercase tracking-widest bg-[var(--color-sage-dark)] hover:bg-[var(--color-sage-text)] text-white shadow-sm flex items-center gap-1.5"
-                          >
-                            {isCurrentAttesting ? (
-                              <>
-                                <RefreshCw className="size-3 animate-spin" />
-                                ATTESTING...
-                              </>
-                            ) : (
-                              <>
-                                <Plus className="size-3" />
-                                ATTEST
-                              </>
-                            )}
-                          </Button>
-                        ) : (
-                          <div className="size-6 rounded-full bg-[var(--color-sage-light)] flex items-center justify-center text-[var(--color-sage-text)]">
-                            <Check className="size-3.5 stroke-[3]" />
-                          </div>
-                        )}
-                      </div>
+            {allVerified ? (
+              /* ── All Verified State ── */
+              <div className="space-y-6 mb-10">
+                <Card className="border-[var(--color-sage-dark)] bg-[var(--color-sage-light)]/20 p-8">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="size-16 rounded-full bg-[var(--color-sage-dark)] flex items-center justify-center mb-4 shadow-[0_0_20px_var(--color-sage-dark)]">
+                      <Shield className="size-8 text-white" />
                     </div>
-                  </Card>
-                );
-              })}
-            </div>
+                    <h3 className="heading-3 text-foreground mb-2">Full Cryptographic Verification</h3>
+                    <p className="text-sm text-muted-foreground max-w-lg">
+                      Your digital identity and assets are fully verified. You have unlocked the maximum borrowing limits and minimal interest rates available on the Rialo protocol.
+                    </p>
+                  </div>
+                </Card>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button
+                    onClick={handleUpdateAttestations}
+                    variant="outline"
+                    className="border-[var(--color-sage-dark)] text-[var(--color-sage-dark)] h-12 px-8 font-mono uppercase tracking-widest"
+                  >
+                    <RefreshCw className="size-4 mr-2" />
+                    Update Attestations
+                  </Button>
+                  <Button
+                    onClick={() => setCurrentStep(1)}
+                    className="btn-primary h-12 px-8"
+                  >
+                    Configure Borrowing Terms →
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              /* ── Partial Progress State ── */
+              <>
+                {/* Live Progress Bar */}
+                <Card className="border-none bg-[var(--glass-bg)] mb-8 p-6">
+                  <div className="flex items-center justify-between mb-3 text-xs font-mono">
+                    <span className="text-muted-foreground">ATTENSION INTEGRITY:</span>
+                    <span className="font-bold text-[var(--color-sage-text)]">{numVerified} / 5 SECURED</span>
+                  </div>
+                  <div className="h-2 bg-[var(--bone)] rounded-full overflow-hidden flex">
+                    <div
+                      className="h-full bg-[var(--color-sage-dark)] transition-all duration-700"
+                      style={{ width: `${(numVerified / 5) * 100}%` }}
+                    />
+                  </div>
+                </Card>
 
-            <div className="flex justify-end pt-4 border-t border-border">
-              <Button
-                onClick={() => setCurrentStep(1)}
-                className="btn-primary px-10 h-12"
-              >
-                Configure Borrowing Terms →
-              </Button>
-            </div>
+                {/* Filtered List of Unverified Credentials */}
+                <div className="space-y-4 mb-10">
+                  {CREDENTIAL_ITEMS.filter((item) => !liveCredentials[item.id]).map((item) => {
+                    const isCurrentAttesting = attestingId === item.id || (verifierWrite.isPending && attestingId === item.id);
+                    const Icon = item.icon;
+
+                    return (
+                      <Card
+                        key={item.id}
+                        className="group/cred border border-border/60 hover:border-[var(--color-sage)]/30 transition-all duration-500 bg-gradient-to-br from-[var(--glass-bg)] to-[var(--glass-bg)]/60 backdrop-blur-sm hover:shadow-lg hover:shadow-[var(--color-sage)]/5 hover:-translate-y-0.5 rounded-2xl overflow-hidden"
+                      >
+                        {/* Subtle accent line */}
+                        <div className="h-px w-full bg-gradient-to-r from-transparent via-[var(--color-sage)]/20 to-transparent opacity-0 group-hover/cred:opacity-100 transition-opacity duration-500" />
+                        
+                        <div className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+                          <div className="flex gap-4 items-start">
+                            <div className="p-3 rounded-xl border bg-gradient-to-br from-[var(--color-sage-light)]/30 to-[var(--color-sage-light)]/10 border-[var(--color-sage)]/20 text-[var(--color-sage-text)] dark:text-[var(--color-sage)] group-hover/cred:scale-110 transition-all duration-300 shadow-sm">
+                              <Icon className="size-5" />
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="text-sm font-semibold text-foreground group-hover/cred:text-[var(--color-sage-text)] transition-colors duration-300">{item.title}</h4>
+                              <p className="text-xs text-muted-foreground leading-relaxed max-w-md">{item.description}</p>
+                              <div className="flex items-center gap-2">
+                                <div className="h-px w-3 bg-[var(--color-sage)]/30" />
+                                <p className="text-[9px] font-mono text-muted-foreground/70">
+                                  {item.method}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex sm:flex-col items-end gap-3 shrink-0 self-end sm:self-center">
+                            <div className="text-right space-y-0.5">
+                              <span className="block text-[10px] font-mono font-bold text-[var(--color-sage-text)] bg-[var(--color-sage-light)]/20 px-2 py-0.5 rounded-lg border border-[var(--color-sage)]/10">{item.collateralDiscount}</span>
+                              <span className="block text-[9px] font-mono text-muted-foreground/70">{item.rateDiscount}</span>
+                            </div>
+                            
+                            <Button
+                              size="sm"
+                              disabled={attestingId !== null}
+                              onClick={() => handleVerifyCredential(item.id)}
+                              className="h-10 px-5 font-mono text-[9px] uppercase tracking-widest bg-gradient-to-r from-[var(--color-sage-dark)] to-[var(--color-sage)] hover:from-[var(--color-sage-text)] hover:to-[var(--color-sage-dark)] text-white shadow-md hover:shadow-lg hover:shadow-[var(--color-sage)]/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center gap-2 rounded-xl"
+                            >
+                              {isCurrentAttesting ? (
+                                <>
+                                  <RefreshCw className="size-3.5 animate-spin" />
+                                  ATTESTING...
+                                </>
+                              ) : (
+                                <>
+                                  <Plus className="size-3.5" />
+                                  ATTEST
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+
+                <div className="flex justify-end pt-4 border-t border-border">
+                  <Button
+                    onClick={() => setCurrentStep(1)}
+                    className="btn-primary px-10 h-12"
+                  >
+                    Configure Borrowing Terms →
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -601,7 +628,7 @@ export default function ApplyPage() {
                     onClick={() => faucets.requestRloFaucet()}
                     className="h-8 px-4 font-mono text-[9px] uppercase tracking-widest bg-amber-600 hover:bg-amber-700 text-white shadow-sm shrink-0"
                   >
-                    {faucets.isMintingRlo ? "Minting..." : "Claim 100k RLO Faucet"}
+                    {faucets.isMintingRlo ? "Minting..." : "Claim 10k RLO Faucet"}
                   </Button>
                 </div>
               ) : (

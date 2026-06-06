@@ -21,7 +21,6 @@ import {
   ShieldAlert,
   Wallet,
   Clock,
-  Sparkles,
   ArrowRight,
   TrendingDown,
   Info,
@@ -29,7 +28,8 @@ import {
   Fingerprint,
   ShieldCheck,
   Lock,
-  Calendar
+  Calendar,
+  RefreshCw
 } from "lucide-react";
 
 /* ── Helpers ────────────────────────────────────────────────── */
@@ -106,17 +106,25 @@ function DashboardStat({
   icon?: ComponentType<{ className?: string }>;
 }) {
   return (
-    <div className="flex items-start justify-between p-6 rounded-xl bg-[var(--glass-bg)] border border-border/40 hover:border-primary/10 hover:shadow-md transition-all duration-300 group">
-      <div className="flex flex-col">
-        <span className="text-[10px] font-mono tracking-widest text-[var(--ink-muted)] uppercase mb-2">{label}</span>
-        <span className="heading-3 !text-2xl text-foreground font-mono">{value}</span>
-        {subvalue && <span className="text-[10px] text-[var(--ink-muted)] font-mono mt-1 opacity-60">{subvalue}</span>}
+    <div className="relative overflow-hidden group/stat flex flex-col justify-between p-6 rounded-2xl bg-card/40 backdrop-blur-md border border-border/40 hover:border-primary/20 hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] transition-all duration-500">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 group-hover/stat:opacity-100 transition-opacity duration-500" />
+      <div className="relative z-10 flex items-start justify-between mb-4">
+        <span className="text-[9px] font-mono tracking-[0.2em] text-muted-foreground uppercase">{label}</span>
+        {Icon && (
+          <div className="p-2 rounded-lg bg-background/50 border border-border/40 text-foreground/80 group-hover/stat:scale-110 group-hover/stat:text-primary transition-all duration-500">
+            <Icon className="size-5" />
+          </div>
+        )}
       </div>
-      {Icon && (
-        <div className="p-1 rounded-full border border-border/10 bg-background/50 backdrop-blur-sm shadow-sm group-hover:scale-105 transition-all duration-500 shrink-0">
-          <Icon className="size-6" />
-        </div>
-      )}
+      <div className="relative z-10">
+        <span className="text-3xl font-bold tracking-tight text-foreground font-mono">{value}</span>
+        {subvalue && (
+          <div className="flex items-center gap-1.5 mt-1.5">
+            <div className="h-px w-3 bg-primary/30" />
+            <span className="text-[10px] font-mono text-muted-foreground/70">{subvalue}</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -138,22 +146,12 @@ export default function DashboardPage() {
   useEffect(() => {
     if (faucets.rloHash) {
       if (faucets.isRloSuccess) {
-        showSuccess("RLO Minted!", "100,000 RLO collateral added to your wallet.", faucets.rloHash);
+        showSuccess("RLO Minted!", "10,000 RLO collateral added to your wallet.", faucets.rloHash);
       } else {
         showPending("Minting RLO Faucet", "Claiming test RLO from faucet...", faucets.rloHash);
       }
     }
   }, [faucets.rloHash, faucets.isRloSuccess]);
-
-  useEffect(() => {
-    if (faucets.usdcHash) {
-      if (faucets.isUsdcSuccess) {
-        showSuccess("USDC Minted!", "1,000 USDC added to your wallet.", faucets.usdcHash);
-      } else {
-        showPending("Minting USDC Faucet", "Claiming test USDC from faucet...", faucets.usdcHash);
-      }
-    }
-  }, [faucets.usdcHash, faucets.isUsdcSuccess]);
 
   const userLoans = pool.userLoans.data as bigint[] | undefined;
   const liveCredentials = (pool.credentials.data as readonly boolean[]) || [false, false, false, false, false];
@@ -237,24 +235,6 @@ export default function DashboardPage() {
           </div>
           
           <div className="flex flex-wrap items-center gap-3">
-            {/* USDC Faucet */}
-            <Button
-              size="sm"
-              onClick={() => faucets.requestUsdcFaucet()}
-              disabled={faucets.isMintingUsdc}
-              variant="outline"
-              className="h-10 px-5 font-mono text-[9px] tracking-widest uppercase border-border text-foreground hover:bg-muted transition-colors flex items-center gap-1.5"
-            >
-              {faucets.isMintingUsdc ? (
-                <>
-                  <Clock className="size-3 animate-spin" />
-                  MINTING USDC...
-                </>
-              ) : (
-                "FAUCET: 1K USDC"
-              )}
-            </Button>
-
             {/* RLO Faucet */}
             <Button
               size="sm"
@@ -269,7 +249,7 @@ export default function DashboardPage() {
                   MINTING RLO...
                 </>
               ) : (
-                "FAUCET: 100K RLO"
+                "FAUCET: 10K RLO"
               )}
             </Button>
 
@@ -323,9 +303,11 @@ export default function DashboardPage() {
           {/* Side Panels: Trust Profile and Stats */}
           <div className="space-y-8">
             {/* ZK DNA Score Card */}
-            <Card className="relative overflow-hidden border border-border/40 bg-gradient-to-br from-[var(--glass-bg)] to-[var(--glass-bg)]/80 shadow-lg backdrop-blur-md group">
+            <Card className="relative overflow-hidden border border-border/40 bg-gradient-to-br from-[var(--glass-bg)] to-[var(--glass-bg)]/60 shadow-lg backdrop-blur-md group hover:shadow-xl hover:shadow-[var(--color-sage)]/5 hover:border-[var(--color-sage)]/20 transition-all duration-500">
               {/* A beautiful glowing orb in the corner to represent ZK / cryptographic reputation energy */}
-              <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[var(--color-sage)]/10 blur-3xl pointer-events-none group-hover:bg-[var(--color-sage)]/25 transition-all duration-700" />
+              <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-[var(--color-sage)]/10 blur-3xl pointer-events-none group-hover:bg-[var(--color-sage)]/20 transition-all duration-700" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-sage)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+              
               <CardContent className="p-8 space-y-6 relative">
                 {/* Top Row: Title & Badge */}
                 <div className="flex items-center justify-between gap-4">
@@ -459,27 +441,47 @@ function LoanPositionCard({ loanId, userAddress }: { loanId: bigint; userAddress
     setNow(BigInt(Math.floor(Date.now() / 1000)));
   }, []);
 
-  // Watch Approval confirmations
+  // Per-card transaction tracking — single-click auto-flow
+  const [localApproveHash, setLocalApproveHash] = useState<`0x${string}` | undefined>(undefined);
+  const [localRepayHash, setLocalRepayHash] = useState<`0x${string}` | undefined>(undefined);
+  const [repaymentConfirmed, setRepaymentConfirmed] = useState(false);
+  const [repaymentError, setRepaymentError] = useState<string | undefined>(undefined);
+
+  // Watch Approval confirmations — auto-trigger repayment after approval
   useEffect(() => {
-    if (repayWrite.approveHash) {
+    if (repayWrite.approveHash && localApproveHash && repayWrite.approveHash === localApproveHash) {
       if (repayWrite.isApproveSuccess) {
         showSuccess("Repayment Approved", "USDC authorized for loan settlement.", repayWrite.approveHash);
+        setLocalApproveHash(undefined);
+        // Auto-trigger repayment immediately after approval
+        setTimeout(async () => {
+          try {
+            setLocalRepayHash(undefined);
+            const hash = await repayWrite.repay(loanId);
+            setLocalRepayHash(hash);
+          } catch (err) {
+            console.error("Auto-repay failed:", err);
+            setRepaymentError("Repayment failed. Please try again.");
+          }
+        }, 500);
       } else {
         showPending("Approving Repayment", "Authorizing USDC spend in your wallet...", repayWrite.approveHash);
       }
     }
-  }, [repayWrite.approveHash, repayWrite.isApproveSuccess]);
+  }, [repayWrite.approveHash, repayWrite.isApproveSuccess, localApproveHash]);
 
   // Watch Repay confirmations
   useEffect(() => {
-    if (repayWrite.repayHash) {
+    if (repayWrite.repayHash && localRepayHash && repayWrite.repayHash === localRepayHash) {
       if (repayWrite.isRepaySuccess) {
         showSuccess("Loan Repaid!", "Your debt has been settled. Locked RLO returned to wallet.", repayWrite.repayHash);
+        setLocalRepayHash(undefined);
+        setRepaymentConfirmed(true);
       } else {
         showPending("Settling Loan", "Repaying USDC outstanding debt on-chain...", repayWrite.repayHash);
       }
     }
-  }, [repayWrite.repayHash, repayWrite.isRepaySuccess]);
+  }, [repayWrite.repayHash, repayWrite.isRepaySuccess, localRepayHash]);
 
   const [refetchTrigger, setRefetchTrigger] = useState(0);
 
@@ -498,6 +500,20 @@ function LoanPositionCard({ loanId, userAddress }: { loanId: bigint; userAddress
       poolRead.usdcBalance.refetch();
     }
   }, [repayWrite.isRepaySuccess]);
+
+  // Helper: is this card currently waiting for its own tx to confirm?
+  const isLocalApproving = localApproveHash !== undefined;
+  const isLocalRepaying = localRepayHash !== undefined;
+
+  // Reset states on mount (cleanup on unmount)
+  useEffect(() => {
+    setRepaymentConfirmed(false);
+    setRepaymentError(undefined);
+    return () => {
+      setRepaymentConfirmed(false);
+      setRepaymentError(undefined);
+    };
+  }, []);
 
   const ld = loanDetails.loan.data as readonly [string, bigint, bigint, bigint, bigint, bigint, bigint, boolean] | undefined;
   const repaymentRaw = loanDetails.repaymentAmount.data as bigint | undefined;
@@ -530,52 +546,64 @@ function LoanPositionCard({ loanId, userAddress }: { loanId: bigint; userAddress
     ? Math.min(100, Math.round((Number(elapsed) / Number(totalDuration)) * 100))
     : 0;
 
-  // Repayment USDC allowance verification
+  // Repayment USDC allowance verification — reactive to refetch
   const currentUsdcAllowance = (poolRead.usdcAllowance.data as bigint) || 0n;
-  const needsApproval = repaymentRaw !== undefined ? currentUsdcAllowance < repaymentRaw : true;
-
-  const handleApproveRepayment = async () => {
-    if (repaymentRaw === undefined) return;
-    try {
-      // Add a $10 USDC safety buffer to prevent race conditions from block-accruing interest
-      const buffer = parseUnits("10", 6);
-      await repayWrite.approveUsdc(repaymentRaw + buffer);
-    } catch (err) {
-      console.error("Repayment approval failed:", err);
-    }
-  };
+  const needsApproval = repaymentRaw !== undefined && currentUsdcAllowance < repaymentRaw;
 
   const handleRepayLoan = async () => {
     try {
-      await repayWrite.repay(loanId);
+      setRepaymentError(undefined);
+      // If approval is needed, trigger approval first
+      if (needsApproval) {
+        const buffer = parseUnits("10", 6);
+        setLocalApproveHash(undefined);
+        const hash = await repayWrite.approveUsdc(repaymentRaw! + buffer);
+        setLocalApproveHash(hash);
+        return;
+      }
+      // Approval already done, trigger repayment directly
+      setLocalRepayHash(undefined);
+      const hash = await repayWrite.repay(loanId);
+      setLocalRepayHash(hash);
     } catch (err) {
-      console.error("Repayment execution failed:", err);
+      console.error("Repayment failed:", err);
+      setRepaymentError("Transaction failed. Please try again.");
     }
   };
 
   return (
-    <Card className="border border-border/40 bg-gradient-to-br from-[var(--glass-bg)] to-[var(--glass-bg)]/90 backdrop-blur-sm shadow-sm hover:shadow-md hover:border-primary/10 transition-all duration-500 rounded-2xl overflow-hidden group">
+    <Card className="border border-border/40 bg-gradient-to-br from-[var(--glass-bg)] to-[var(--glass-bg)]/70 backdrop-blur-md shadow-sm hover:shadow-xl hover:shadow-[var(--color-sage)]/5 hover:border-[var(--color-sage)]/20 transition-all duration-500 rounded-2xl overflow-hidden group">
+      {/* Subtle top accent line */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-[var(--color-sage)]/20 to-transparent" />
+      
       <CardContent className="p-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Principal & APR readout */}
           <div className="flex items-center gap-5">
             {/* Premium Dynamic Token Seal */}
-            <div className="w-12 h-12 rounded-xl bg-primary/5 border border-border/40 flex flex-col items-center justify-center font-mono shrink-0 shadow-inner group-hover:bg-[var(--color-sage-light)]/20 group-hover:border-[var(--color-sage)]/30 transition-all duration-500">
-              <span className="text-[7px] uppercase tracking-[0.2em] text-muted-foreground/60 leading-none">id</span>
-              <span className="text-xs font-bold text-foreground font-mono mt-0.5 leading-none">#{loanId.toString()}</span>
+            <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--color-sage-light)]/30 to-[var(--color-sage-light)]/10 border border-[var(--color-sage)]/20 flex flex-col items-center justify-center font-mono shrink-0 group-hover:scale-105 group-hover:border-[var(--color-sage)]/40 transition-all duration-500 shadow-sm">
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[var(--color-sage)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <span className="relative z-10 text-[6px] uppercase tracking-[0.25em] text-[var(--color-sage-text)]/60 dark:text-[var(--color-sage)]/60 leading-none">ID</span>
+              <span className="relative z-10 text-sm font-bold text-foreground leading-none">#{loanId.toString().slice(-4)}</span>
             </div>
             
             <div className="space-y-1">
               <div className="flex items-center gap-3">
                 <span className="heading-3 !text-lg font-mono text-foreground">${formatUSDC(borrowedAmount)} USDC</span>
                 {isOverdue ? (
-                  <div className="px-2.5 py-0.5 rounded-full border border-red-500/25 bg-red-500/10 text-red-600 dark:text-red-400 text-[8px] font-mono font-bold tracking-widest uppercase flex items-center gap-1 animate-pulse">
-                    <span className="w-1 h-1 rounded-full bg-red-500" />
+                  <div className="px-3 py-1 rounded-full border border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400 text-[9px] font-mono font-bold tracking-widest uppercase flex items-center gap-2 shadow-sm">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                    </span>
                     OVERDUE
                   </div>
                 ) : (
-                  <div className="px-2.5 py-0.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[8px] font-mono font-bold tracking-widest uppercase flex items-center gap-1">
-                    <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                  <div className="px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[9px] font-mono font-bold tracking-widest uppercase flex items-center gap-2 shadow-sm">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-pulse absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
                     ACTIVE
                   </div>
                 )}
@@ -603,9 +631,9 @@ function LoanPositionCard({ loanId, userAddress }: { loanId: bigint; userAddress
               </span>
             </div>
             
-            <div className="h-1.5 bg-muted dark:bg-muted/30 rounded-full overflow-hidden">
+            <div className="relative h-2 bg-muted/50 dark:bg-muted/30 rounded-full overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
               <div 
-                className={`h-full transition-all duration-1000 ${isOverdue ? "bg-gradient-to-r from-red-500 to-rose-500" : "bg-gradient-to-r from-[var(--color-sage-dark)] to-[var(--color-sage)]"}`} 
+                className={`h-full transition-all duration-1000 rounded-full ${isOverdue ? "bg-gradient-to-r from-red-600 to-rose-500" : "bg-gradient-to-r from-[var(--color-sage-dark)] to-[var(--color-sage)] shadow-[0_0_12px_rgba(169,221,211,0.4)]"}`} 
                 style={{ width: `${progressPercent}%` }} 
               />
             </div>
@@ -618,42 +646,72 @@ function LoanPositionCard({ loanId, userAddress }: { loanId: bigint; userAddress
             )}
           </div>
 
-          {/* Settle loan action buttons */}
-          <div className="shrink-0 flex self-end lg:self-center">
+          {/* Settle loan action button — single-click auto-flow */}
+          <div className="shrink-0 flex flex-col items-end gap-1 self-end lg:self-center">
             {repaymentRaw !== undefined && (
-              needsApproval ? (
-                <Button 
-                  size="sm" 
-                  onClick={handleApproveRepayment} 
-                  disabled={repayWrite.isApproving}
-                  className="h-10 px-6 font-mono text-[9px] uppercase tracking-widest bg-[var(--color-sage-dark)] hover:bg-[var(--color-sage-text)] text-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-sm flex items-center gap-1.5 rounded-xl cursor-pointer"
-                >
-                  {repayWrite.isApproving ? (
-                    <>
-                      <Clock className="size-3 animate-spin" />
-                      APPROVING...
-                    </>
-                  ) : (
-                    "APPROVE USDC"
-                  )}
-                </Button>
-              ) : (
+              <>
+                {/* Progress status text */}
+                {isLocalApproving && (
+                  <div className="flex items-center gap-1.5 text-[8px] font-mono uppercase tracking-wider text-[var(--color-sage)]">
+                    <div className="h-1.5 w-1.5 rounded-full bg-[var(--color-sage)] animate-pulse" />
+                    Approving USDC spend authorization...
+                  </div>
+                )}
+                {isLocalRepaying && (
+                  <div className="flex items-center gap-1.5 text-[8px] font-mono uppercase tracking-wider text-[var(--color-sage)]">
+                    <div className="h-1.5 w-1.5 rounded-full bg-[var(--color-sage)] animate-pulse" />
+                    Settling loan debt...
+                  </div>
+                )}
+                {repaymentError && (
+                  <div className="text-[8px] font-mono text-red-500/80">
+                    {repaymentError}
+                  </div>
+                )}
+
+                {/* Main action button */}
                 <Button 
                   size="sm" 
                   onClick={handleRepayLoan} 
-                  disabled={repayWrite.isRepaying}
-                  className="relative overflow-hidden h-10 px-6 font-mono text-[9px] uppercase tracking-widest bg-primary text-primary-foreground shadow-md hover:shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 rounded-xl flex items-center gap-1.5 cursor-pointer animate-pulse duration-2000"
+                  disabled={isLocalApproving || isLocalRepaying || repaymentConfirmed}
+                  className={`relative overflow-hidden h-11 px-6 font-mono text-[9px] uppercase tracking-widest shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 rounded-xl flex items-center gap-2 cursor-pointer ${
+                    repaymentConfirmed
+                      ? "bg-emerald-600/90 text-white shadow-emerald-500/20"
+                      : isLocalApproving || isLocalRepaying
+                      ? "bg-muted/80 text-muted-foreground cursor-wait"
+                      : repaymentError
+                      ? "bg-red-600/90 text-white shadow-red-500/20"
+                      : "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-primary/20"
+                  }`}
                 >
-                  {repayWrite.isRepaying ? (
+                  {repaymentConfirmed ? (
                     <>
-                      <Clock className="size-3 animate-spin" />
-                      REPAYING...
+                      <ShieldCheck className="size-3.5" />
+                      CONFIRMED
+                    </>
+                  ) : isLocalApproving ? (
+                    <>
+                      <Clock className="size-3.5 animate-spin" />
+                      APPROVING
+                    </>
+                  ) : isLocalRepaying ? (
+                    <>
+                      <Clock className="size-3.5 animate-spin" />
+                      REPAYING
+                    </>
+                  ) : repaymentError ? (
+                    <>
+                      <RefreshCw className="size-3.5" />
+                      RETRY
                     </>
                   ) : (
-                    "REPAY DEBT"
+                    <>
+                      <CheckCircle className="size-3.5" />
+                      REPAY DEBT
+                    </>
                   )}
                 </Button>
-              )
+              </>
             )}
           </div>
 

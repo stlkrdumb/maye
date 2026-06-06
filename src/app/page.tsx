@@ -2,30 +2,73 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { usePoolRead } from "@/hooks/useContracts";
-import { formatUSDC } from "@/types/contracts";
+
+/* ── Animation Variants ─────────────────────────────────────────── */
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.3,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring" as const,
+      stiffness: 100,
+      damping: 20,
+    },
+  },
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
 
 /* ── Components ────────────────────────────────────────────────── */
 
 function FeatureIcon({ children }: { children: React.ReactNode }) {
   return (
-    <div className="size-12 rounded-xl bg-[var(--bone)]/30 flex items-center justify-center text-[var(--color-sage-dark)] mb-6 group-hover:scale-110 transition-transform duration-500 shadow-sm border border-[var(--border)]">
-      {children}
-    </div>
+    <motion.div 
+      whileHover={{ scale: 1.1 }}
+      className="relative size-12 rounded-xl bg-gradient-to-br from-[var(--color-sage-light)]/30 to-[var(--color-sage-light)]/10 flex items-center justify-center text-[var(--color-sage-text)] dark:text-[var(--color-sage)] mb-6 shadow-sm border border-[var(--color-sage)]/20 hover:shadow-md hover:border-[var(--color-sage)]/40 transition-all duration-300"
+    >
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[var(--color-sage)]/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+      <span className="relative z-10">{children}</span>
+    </motion.div>
   );
 }
 
 function SectionLabel({ children }: { children: string }) {
   return (
-    <div className="flex items-center gap-4 mb-8 fade-up">
-      <div className="h-px w-8 bg-[var(--color-sage-dark)] opacity-30" />
-      <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-[var(--ink-muted)] opacity-60">
+    <motion.div 
+      variants={itemVariants}
+      className="flex items-center gap-4 mb-8"
+    >
+      <div className="h-px w-8 bg-gradient-to-r from-[var(--color-sage-dark)] to-transparent opacity-40" />
+      <span className="text-[9px] font-mono tracking-[0.25em] uppercase text-[var(--ink-muted)] opacity-70 font-medium">
         {children}
       </span>
-    </div>
+    </motion.div>
   );
 }
 
@@ -33,113 +76,183 @@ function SectionLabel({ children }: { children: string }) {
 
 export default function HomePage() {
   const pool = usePoolRead();
-  const totalDeposits = pool.totalDeposits.data as bigint | undefined;
+  // Note: In a real app, handle loading/error states from pool
+  // const totalDeposits = pool.totalDeposits.data as bigint | undefined;
 
   return (
     <div className="relative overflow-hidden">
       {/* Dynamic Background */}
       <div className="fixed inset-0 -z-10">
-        <div className="absolute top-[-10%] right-[-5%] size-[600px] rounded-full bg-[var(--color-sage)]/5 blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[10%] left-[-5%] size-[500px] rounded-full bg-[var(--color-bone)]/10 blur-[100px]" />
+        <motion.div 
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute top-[-10%] right-[-5%] size-[600px] rounded-full bg-[var(--color-sage)]/5 blur-[120px]" 
+        />
+        <motion.div 
+          animate={{
+            scale: [1, 1.05, 1],
+            opacity: [0.1, 0.2, 0.1],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute bottom-[10%] left-[-5%] size-[500px] rounded-full bg-[var(--color-bone)]/10 blur-[100px]" 
+        />
       </div>
 
       {/* ── CHAPTER 0: HERO ── */}
-      <section className="relative pt-24 md:pt-32 pb-32 px-4 md:px-8 max-w-7xl mx-auto">
+      <motion.section 
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="relative pt-24 md:pt-32 pb-32 px-4 md:px-8 max-w-7xl mx-auto"
+      >
         <div className="max-w-3xl">
-          <Badge variant="outline" className="mb-8 py-1.5 px-4 border-[var(--color-sage)]/20 text-[var(--color-sage-text)] bg-[var(--color-sage-light)]/10 backdrop-blur-sm fade-up">
-            NOW LIVE ON BASE SEPOLIA
-          </Badge>
+          <motion.div variants={itemVariants}>
+            <Badge variant="outline" className="mb-8 py-1.5 px-4 border-[var(--color-sage)]/20 text-[var(--color-sage-text)] bg-[var(--color-sage-light)]/10 backdrop-blur-sm">
+              NOW LIVE ON BASE SEPOLIA
+            </Badge>
+          </motion.div>
           
-          <h1 className="heading-display !text-[clamp(3.5rem,9vw,6.5rem)] leading-[0.85] tracking-tighter mb-10 fade-up" style={{ animationDelay: '100ms' }}>
+          <motion.h1 
+            variants={itemVariants}
+            className="heading-display !text-[clamp(3.5rem,9vw,6.5rem)] leading-[0.85] tracking-tighter mb-10"
+          >
             Capital based on <br />
-            <span className="italic font-normal opacity-90" style={{ fontFamily: 'Newsreader, serif' }}>behavior,</span> not history.
-          </h1>
+            <span className="italic font-normal opacity-90" style={{ fontFamily: 'Newsreader, serif' }}>behavior,</span > not history.
+          </motion.h1>
 
-          <p className="text-xl md:text-2xl text-[var(--ink-muted)] leading-relaxed mb-12 max-w-2xl fade-up" style={{ animationDelay: '200ms' }}>
+          <motion.p 
+            variants={itemVariants}
+            className="text-xl md:text-2xl text-[var(--ink-muted)] leading-relaxed mb-12 max-w-2xl"
+          >
             maye sequences your financial DNA using <span className="text-[var(--ink)] font-semibold">Zero-Knowledge Proofs</span> to unlock fair, 
             unsecured credit. Cryptographically private, trustless, and friction-free.
-          </p>
+          </motion.p>
 
-          <div className="flex flex-wrap gap-4 fade-up" style={{ animationDelay: '300ms' }}>
+          <motion.div 
+            variants={itemVariants}
+            className="flex flex-wrap gap-4"
+          >
             <Link href="/apply">
-              <Button className="h-14 px-10 btn-primary !rounded-full shadow-lg shadow-[var(--color-sage)]/10">
+              <Button className="h-14 px-10 btn-primary !rounded-full shadow-lg shadow-[var(--color-sage)]/10 hover:shadow-xl hover:shadow-[var(--color-sage)]/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
                 Verify Your DNA
               </Button>
             </Link>
             <Link href="/lend">
-              <Button variant="outline" className="h-14 px-10 border-[var(--border)] !rounded-full hover:bg-[var(--bone)]/20 transition-all duration-300">
+              <Button variant="outline" className="h-14 px-10 border-[var(--border)] !rounded-full hover:bg-[var(--bone)]/20 hover:border-[var(--color-sage)]/30 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
                 Provide Liquidity →
               </Button>
             </Link>
-          </div>
+          </motion.div>
         </div>
 
         {/* Hero Visual */}
-        <div className="absolute top-1/2 right-0 -translate-y-1/2 hidden lg:block w-1/3 fade-up" style={{ animationDelay: '400ms' }}>
+        <motion.div 
+          variants={itemVariants}
+          className="absolute top-1/2 right-0 -translate-y-1/2 hidden lg:block w-1/3"
+        >
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-sage)]/20 to-transparent blur-3xl rounded-full" />
-            <Card className="border-none bg-white/40 backdrop-blur-xl shadow-2xl rounded-3xl p-8 relative overflow-hidden group">
-              <div className="flex justify-end items-start mb-12">
-                <Badge className="bg-[var(--color-sage-dark)] text-white">ZK-Verified</Badge>
+            <Card className="border-none bg-white/50 backdrop-blur-xl shadow-2xl rounded-3xl p-8 relative overflow-hidden group hover:shadow-3xl transition-all duration-500">
+              {/* Subtle gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-sage)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              
+              <div className="relative z-10 flex justify-end items-start mb-12">
+                <Badge className="bg-gradient-to-r from-[var(--color-sage-dark)] to-[var(--color-sage)] text-white shadow-md">ZK-Verified</Badge>
               </div>
-              <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--ink-muted)] opacity-50 mb-2">ZK Proof Verification</p>
-              <p className="text-5xl font-bold tracking-tighter text-[var(--ink)] mb-4">742</p>
-              <div className="h-1.5 w-full bg-[var(--bone)] rounded-full overflow-hidden mb-8">
-                <div className="h-full bg-[var(--color-sage-dark)] w-[74.2%] transition-all duration-1000 delay-500" />
+              <p className="text-[9px] font-mono uppercase tracking-[0.2em] text-[var(--ink-muted)] opacity-60 mb-2">ZK Proof Verification</p>
+              <p className="text-6xl font-bold tracking-tighter text-[var(--ink)] mb-4">742</p>
+              <div className="relative h-2 w-full bg-[var(--bone)] rounded-full overflow-hidden ring-1 ring-black/5">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: "74.2%" }}
+                  transition={{ duration: 1.5, delay: 0.5, ease: "circOut" }}
+                  className="h-full bg-gradient-to-r from-[var(--color-sage-dark)] to-[var(--color-sage)] rounded-full shadow-[0_0_12px_rgba(169,221,211,0.4)]" 
+                />
               </div>
-              <p className="text-sm font-medium leading-tight">Tier: Prime <br /><span className="text-[var(--ink-muted)] opacity-60 font-normal">Eligible for up to $5,000</span></p>
+              <p className="text-sm font-medium leading-tight mt-6">Tier: Prime <br /><span className="text-[var(--ink-muted)] opacity-60 font-normal">Eligible for up to $5,000</span></p>
             </Card>
           </div>
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
       {/* ── CHAPTER 1: THE INVISIBLE ── */}
-      <section className="py-32 md:py-48 bg-[var(--color-bone)]/30 border-y border-[var(--border)]">
+      <motion.section 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={containerVariants}
+        className="py-32 md:py-48 bg-[var(--color-bone)]/30 border-y border-[var(--border)]"
+      >
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <SectionLabel>The Problem</SectionLabel>
           <div className="grid lg:grid-cols-2 gap-20 items-center">
-            <div>
-              <h2 className="heading-2 !text-[clamp(2.5rem,5vw,4rem)] leading-[1.1] mb-8 fade-up">
+            <motion.div variants={itemVariants}>
+              <h2 className="heading-2 !text-[clamp(2.5rem,5vw,4rem)] leading-[1.1] mb-8">
                 32 million Americans are <span className="italic">credit invisible.</span>
               </h2>
-              <p className="text-lg text-[var(--ink-muted)] leading-relaxed mb-8 fade-up">
+              <p className="text-lg text-[var(--ink-muted)] leading-relaxed mb-8">
                 Legacy scoring models rely on decades of debt history. If you&apos;re young, 
                 an immigrant, or debt-averse, the system effectively ignores you — 
                 regardless of your real financial health.
               </p>
-              <p className="text-lg text-[var(--ink-muted)] leading-relaxed fade-up">
+              <p className="text-lg text-[var(--ink-muted)] leading-relaxed">
                 We use ZKPs to look at <span className="text-[var(--ink)] font-semibold underline decoration-[var(--color-sage)]/50">private financial signals:</span> 
                 income stability, spending predictability, and bank-verified cash flow.
               </p>
-            </div>
+            </motion.div>
             
-            <div className="grid sm:grid-cols-2 gap-4 fade-up">
+            <motion.div 
+              variants={staggerContainer}
+              className="grid sm:grid-cols-2 gap-4"
+            >
               {[
                 { label: "Credit Invisible", value: "32M", desc: "Reliable adults with no score." },
                 { label: "TAM", value: "$5.1T", desc: "Unsecured consumer debt market." },
                 { label: "Efficiency", value: "97%", desc: "Avg. digital repayment rates." },
                 { label: "Speed", value: "< 3m", desc: "Average time to onchain credit." }
               ].map((s, i) => (
-                <Card key={i} className="border-none bg-white/60 backdrop-blur-sm p-6 hover:bg-white transition-colors duration-500">
-                  <p className="text-4xl font-bold tracking-tighter mb-1">{s.value}</p>
-                  <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--ink-muted)] opacity-60 mb-3">{s.label}</p>
-                  <p className="text-xs text-[var(--ink-muted)] leading-relaxed">{s.desc}</p>
-                </Card>
+                <motion.div key={i} variants={itemVariants}>
+                  <Card className="border-none bg-white/60 backdrop-blur-sm p-6 hover:bg-white transition-colors duration-500 h-full">
+                    <p className="text-4xl font-bold tracking-tighter mb-1">{s.value}</p>
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--ink-muted)] opacity-60 mb-3">{s.label}</p>
+                    <p className="text-xs text-[var(--ink-muted)] leading-relaxed">{s.desc}</p>
+                  </Card>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── CHAPTER 2: THE ENGINE ── */}
-      <section className="py-32 md:py-48 px-4 md:px-8 max-w-7xl mx-auto">
+      <motion.section 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={containerVariants}
+        className="py-32 md:py-48 px-4 md:px-8 max-w-7xl mx-auto"
+      >
         <div className="text-center max-w-2xl mx-auto mb-24">
           <SectionLabel>How it Works</SectionLabel>
-          <h2 className="heading-2 mb-6">Integrated intelligence.</h2>
-          <p className="text-[var(--ink-muted)]">Three layers between you and the capital you need.</p>
+          <motion.h2 variants={itemVariants} className="heading-2 mb-6">Integrated intelligence.</motion.h2>
+          <motion.p variants={itemVariants} className="text-[var(--ink-muted)]">Three layers between you and the capital you need.</motion.p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-12 relative">
+        <motion.div 
+          variants={staggerContainer}
+          className="grid md:grid-cols-3 gap-12 relative"
+        >
           {/* Connector Line */}
           <div className="absolute top-24 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--border)] to-transparent hidden md:block" />
           
@@ -163,32 +276,39 @@ export default function HomePage() {
               icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
             }
           ].map((item, i) => (
-            <div key={i} className="group relative fade-up" style={{ animationDelay: `${i * 150}ms` }}>
-              <div className="relative size-16 rounded-2xl bg-[var(--glass-bg)] border border-[var(--glass-border)] shadow-[var(--glass-shadow)] flex items-center justify-center mb-12 group-hover:border-[var(--color-sage-dark)] transition-all duration-500 z-10 text-[var(--foreground)]">
-                <span className="absolute -top-3 -right-3 text-[10px] font-mono font-bold text-[var(--color-sage-dark)] opacity-40">{item.step}</span>
-                {item.icon}
+            <motion.div key={i} variants={itemVariants} className="group relative">
+              <div className="relative size-16 rounded-2xl bg-gradient-to-br from-[var(--glass-bg)] to-[var(--glass-bg)]/60 border border-[var(--glass-border)] shadow-[var(--glass-shadow)] flex items-center justify-center mb-12 group-hover:border-[var(--color-sage)]/40 group-hover:shadow-lg transition-all duration-500 z-10 text-[var(--foreground)] hover:-translate-y-1">
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[var(--color-sage)]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <span className="absolute -top-3 -right-3 text-[9px] font-mono font-bold text-[var(--color-sage-text)] dark:text-[var(--color-sage)] opacity-60 bg-[var(--background)] px-1.5 py-0.5 rounded-md border border-[var(--border)]">{item.step}</span>
+                <span className="relative z-10">{item.icon}</span>
               </div>
-              <h3 className="heading-3 mb-4 text-[var(--foreground)]">{item.title}</h3>
+              <h3 className="heading-3 mb-4 text-[var(--foreground)] group-hover:text-[var(--color-sage-text)] dark:group-hover:text-[var(--color-sage)] transition-colors duration-300">{item.title}</h3>
               <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">{item.desc}</p>
-            </div>
+            </motion.div>
           ))}
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
       {/* ── CHAPTER 3: WHY ONCHAIN ── */}
-      <section className="py-32 md:py-48 bg-[var(--primary)] text-[var(--primary-foreground)] relative overflow-hidden">
+      <motion.section 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={containerVariants}
+        className="py-32 md:py-48 bg-[var(--primary)] text-[var(--primary-foreground)] relative overflow-hidden"
+      >
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
           <div className="absolute top-[-20%] left-[-10%] size-[800px] rounded-full bg-[var(--color-sage-dark)] blur-[150px]" />
         </div>
         
         <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
-          <div className="flex items-center gap-4 mb-16">
+          <motion.div variants={itemVariants} className="flex items-center gap-4 mb-16">
             <div className="h-px w-8 bg-[var(--primary-foreground)] opacity-30" />
             <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-[var(--primary-foreground)] opacity-80">Infrastructure</span>
-          </div>
+          </motion.div>
 
           <div className="grid lg:grid-cols-2 gap-20">
-            <div>
+            <motion.div variants={itemVariants}>
               <h2 className="heading-display !text-[var(--primary-foreground)] leading-[1.1] mb-12">
                 A protocol built for <br />
                 <span className="italic opacity-60">transparency.</span>
@@ -198,45 +318,75 @@ export default function HomePage() {
                   { title: "Verifiable Solvency", desc: "Pool liquidity and borrower health are 100% transparent and verifiable on Base Sepolia." },
                   { title: "Deterministic Execution", desc: "Loan terms, interest accrual, and repayments are managed by immutable smart contracts." }
                 ].map((f, i) => (
-                  <div key={i} className="fade-up" style={{ animationDelay: `${i * 100}ms` }}>
+                  <motion.div key={i} variants={itemVariants}>
                     <h4 className="heading-3 !text-[var(--primary-foreground)] mb-2">{f.title}</h4>
                     <p className="text-[var(--primary-foreground)] opacity-60 leading-relaxed max-w-sm">{f.desc}</p>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
-            <div className="grid gap-6">
+            <motion.div 
+              variants={staggerContainer}
+              className="grid gap-6"
+            >
               {[
                 { title: "Composable Capital", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg> },
                 { title: "Non-Custodial", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg> },
                 { title: "Yield Recirculation", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg> }
               ].map((b, i) => (
-                <div key={i} className="flex items-center gap-6 p-6 rounded-2xl bg-[var(--primary-foreground)]/5 border border-[var(--primary-foreground)]/10 hover:bg-[var(--primary-foreground)]/10 transition-all duration-300 group">
-                  <div className="size-12 rounded-xl bg-[var(--primary-foreground)]/10 flex items-center justify-center group-hover:scale-110 transition-transform text-[var(--primary-foreground)]">{b.icon}</div>
-                  <span className="font-semibold tracking-tight text-lg text-[var(--primary-foreground)]">{b.title}</span>
-                </div>
+                <motion.div 
+                  key={i} 
+                  variants={itemVariants}
+                  className="group/feature flex items-center gap-6 p-6 rounded-2xl bg-[var(--primary-foreground)]/5 border border-[var(--primary-foreground)]/10 hover:bg-[var(--primary-foreground)]/10 hover:border-[var(--primary-foreground)]/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+                >
+                  <div className="size-12 rounded-xl bg-[var(--primary-foreground)]/10 flex items-center justify-center group-hover/feature:scale-110 group-hover/feature:bg-[var(--primary-foreground)]/15 transition-all duration-300 text-[var(--primary-foreground)]">
+                    {b.icon}
+                  </div>
+                  <span className="font-semibold tracking-tight text-lg text-[var(--primary-foreground)] group-hover/feature:text-[var(--color-sage)] transition-colors duration-300">{b.title}</span>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── FINAL CTA ── */}
       <section className="py-48 px-4 md:px-8 text-center relative overflow-hidden">
+        {/* Background glow */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[var(--color-sage)]/5 blur-[120px]" />
+        </div>
+        
         <div className="max-w-2xl mx-auto relative z-10">
-          <h2 className="heading-display mb-8">Ready to sequence?</h2>
-          <p className="text-xl text-[var(--ink-muted)] mb-12">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="heading-display mb-8"
+          >
+            Ready to sequence?
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-xl text-[var(--ink-muted)] mb-12"
+          >
             Get your AI Credit Score and access liquidity in under 3 minutes.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          </motion.p>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          >
             <Link href="/apply" className="w-full sm:w-auto">
-              <Button className="h-16 px-12 btn-primary !rounded-full w-full">Start Application</Button>
+              <Button className="h-16 px-12 btn-primary !rounded-full w-full shadow-lg shadow-[var(--color-sage)]/10 hover:shadow-xl hover:shadow-[var(--color-sage)]/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">Start Application</Button>
             </Link>
             <Link href="/lend" className="w-full sm:w-auto">
-              <Button variant="outline" className="h-16 px-12 !rounded-full border-[var(--border)] w-full">Browse Yields</Button>
+              <Button variant="outline" className="h-16 px-12 !rounded-full border-[var(--border)] w-full hover:bg-[var(--bone)]/20 hover:border-[var(--color-sage)]/30 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">Browse Yields</Button>
             </Link>
-          </div>
+          </motion.div>
         </div>
       </section>
 

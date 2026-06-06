@@ -226,6 +226,26 @@
   box-shadow: var(--glass-shadow);
 }
 
+/* ---- Premium Card ---- */
+@utility card-premium {
+  @apply card glass-premium rounded-2xl;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  &:hover {
+    border-color: var(--color-sage) / 0.3;
+    box-shadow: 
+      0 12px 48px rgba(0, 0, 0, 0.06),
+      0 4px 16px rgba(0, 0, 0, 0.03),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+}
+
+.dark .card-premium:hover {
+  box-shadow: 
+    0 12px 48px rgba(0, 0, 0, 0.5),
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
 /* ---- Input Base (light) ---- */
 @utility input-field {
   width: 100%;
@@ -250,6 +270,18 @@
   }
 }
 
+/* ---- Premium Input ---- */
+@utility input-premium {
+  @apply input-field focus-ring-premium rounded-xl;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  &:hover {
+    border-color: var(--color-sage) / 0.4;
+  }
+}
+
 /* ---- Scroll Entry Animation ---- */
 @utility fade-up {
   opacity: 0;
@@ -262,6 +294,60 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ── Premium Micro-interactions ─────────────────────────────────── */
+
+@utility hover-lift {
+  @apply transition-all duration-300;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  }
+}
+
+@utility glass-premium {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid var(--glass-border);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.04),
+    0 2px 8px rgba(0, 0, 0, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.dark .glass-premium {
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+@utility shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@utility focus-ring-premium {
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--ring), 0 0 20px rgba(169, 221, 211, 0.15);
+  }
+}
+
+.dark .focus-ring-premium:focus-visible {
+  box-shadow: 0 0 0 3px var(--ring), 0 0 20px rgba(140, 196, 184, 0.2);
 }
 
 /* ---- Reduced Motion ---- */
@@ -340,9 +426,13 @@
   --radius: 0.6rem;
 
   /* Glass Effects */
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(1, 1, 1, 0.04);
-  --glass-shadow: 0 8px 32px 0 rgba(1, 1, 1, 0.02);
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(1, 1, 1, 0.06);
+  --glass-shadow: 0 8px 32px 0 rgba(1, 1, 1, 0.03);
+  
+  /* Premium Gradients */
+  --gradient-subtle: linear-gradient(135deg, rgba(169, 221, 211, 0.08) 0%, rgba(212, 238, 232, 0.04) 100%);
+  --gradient-premium: linear-gradient(135deg, rgba(169, 221, 211, 0.15) 0%, rgba(140, 196, 184, 0.08) 50%, rgba(212, 238, 232, 0.04) 100%);
 }
 
 .dark {
@@ -368,9 +458,13 @@
   --ring: #8cc4b8;
 
   /* Glass Effects */
-  --glass-bg: rgba(18, 18, 17, 0.7);
-  --glass-border: rgba(232, 227, 213, 0.06);
+  --glass-bg: rgba(18, 18, 17, 0.75);
+  --glass-border: rgba(232, 227, 213, 0.08);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  
+  /* Premium Gradients */
+  --gradient-subtle: linear-gradient(135deg, rgba(140, 196, 184, 0.12) 0%, rgba(26, 47, 41, 0.06) 100%);
+  --gradient-premium: linear-gradient(135deg, rgba(140, 196, 184, 0.18) 0%, rgba(169, 221, 211, 0.08) 50%, rgba(26, 47, 41, 0.04) 100%);
 }
 
 @keyframes toast-slide-in {
