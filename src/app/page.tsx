@@ -5,72 +5,10 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { usePoolRead } from "@/hooks/useContracts";
-
-/* ── Animation Variants ─────────────────────────────────────────── */
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.3,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: "spring" as const,
-      stiffness: 100,
-      damping: 20,
-    },
-  },
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-/* ── Components ────────────────────────────────────────────────── */
-
-function FeatureIcon({ children }: { children: React.ReactNode }) {
-  return (
-    <motion.div 
-      whileHover={{ scale: 1.1 }}
-      className="relative size-12 rounded-xl bg-gradient-to-br from-[var(--color-sage-light)]/30 to-[var(--color-sage-light)]/10 flex items-center justify-center text-[var(--color-sage-text)] dark:text-[var(--color-sage)] mb-6 shadow-sm border border-[var(--color-sage)]/20 hover:shadow-md hover:border-[var(--color-sage)]/40 transition-all duration-300"
-    >
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[var(--color-sage)]/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
-      <span className="relative z-10">{children}</span>
-    </motion.div>
-  );
-}
-
-function SectionLabel({ children }: { children: string }) {
-  return (
-    <motion.div 
-      variants={itemVariants}
-      className="flex items-center gap-4 mb-8"
-    >
-      <div className="h-px w-8 bg-gradient-to-r from-[var(--color-sage-dark)] to-transparent opacity-40" />
-      <span className="text-[9px] font-mono tracking-[0.25em] uppercase text-[var(--ink-muted)] opacity-70 font-medium">
-        {children}
-      </span>
-    </motion.div>
-  );
-}
+import { FeatureIcon, SectionLabel } from "@/components/home";
+import { HOME_FEATURES, HOME_BENEFITS, containerVariants, itemVariants, staggerContainer } from "@/lib/constants";
 
 /* ── Main Page ──────────────────────────────────────────────────── */
 
@@ -148,6 +86,7 @@ export default function HomePage() {
                 Verify Your DNA
               </Button>
             </Link>
+
             <Link href="/lend">
               <Button variant="outline" className="h-14 px-10 border-[var(--border)] !rounded-full hover:bg-[var(--bone)]/20 hover:border-[var(--color-sage)]/30 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
                 Provide Liquidity →
@@ -256,26 +195,7 @@ export default function HomePage() {
           {/* Connector Line */}
           <div className="absolute top-24 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--border)] to-transparent hidden md:block" />
           
-          {[
-            {
-              step: "01",
-              title: "Sequence",
-              desc: "Link your bank data or on-chain history. Our AI analyzes patterns, not just points.",
-              icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m7 11 2-2-2-2M11 19h10M15 9l2 2-2 2M3 13l2 2-2 2" /></svg>
-            },
-            {
-              step: "02",
-              title: "Attest",
-              desc: "Results are attested onchain to your address, creating a portable credit reputation.",
-              icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-            },
-            {
-              step: "03",
-              title: "Deploy",
-              desc: "Receive USDC instantly from the liquidity pool based on your dynamic terms.",
-              icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-            }
-          ].map((item, i) => (
+          {HOME_FEATURES.map((item, i) => (
             <motion.div key={i} variants={itemVariants} className="group relative">
               <div className="relative size-16 rounded-2xl bg-gradient-to-br from-[var(--glass-bg)] to-[var(--glass-bg)]/60 border border-[var(--glass-border)] shadow-[var(--glass-shadow)] flex items-center justify-center mb-12 group-hover:border-[var(--color-sage)]/40 group-hover:shadow-lg transition-all duration-500 z-10 text-[var(--foreground)] hover:-translate-y-1">
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[var(--color-sage)]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -330,11 +250,7 @@ export default function HomePage() {
               variants={staggerContainer}
               className="grid gap-6"
             >
-              {[
-                { title: "Composable Capital", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg> },
-                { title: "Non-Custodial", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg> },
-                { title: "Yield Recirculation", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg> }
-              ].map((b, i) => (
+              {HOME_BENEFITS.map((b, i) => (
                 <motion.div 
                   key={i} 
                   variants={itemVariants}
