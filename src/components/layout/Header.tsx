@@ -34,7 +34,7 @@ export function Header() {
               src="/logo.svg"
               alt="Maye Logo"
               fill
-              className="object-contain dark:brightness-150"
+              className="object-contain opacity-80"
               priority
             />
           </div>
