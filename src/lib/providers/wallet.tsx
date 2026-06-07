@@ -44,7 +44,19 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider theme={theme === "dark" ? darkTheme() : lightTheme()}>
+        <RainbowKitProvider
+          theme={
+            theme === "dark"
+              ? darkTheme({
+                  accentColor: "var(--color-sage)",
+                  accentColorForeground: "var(--color-white)",
+                })
+              : lightTheme({
+                  accentColor: "var(--color-sage)",
+                  accentColorForeground: "var(--color-sage-text)",
+                })
+          }
+        >
           {children}
         </RainbowKitProvider>
       </QueryClientProvider>
