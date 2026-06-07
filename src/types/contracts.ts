@@ -81,7 +81,12 @@ export type PoolStats = {
 
 /** Convert USDC amount (6 decimals) to human-readable */
 export function formatUSDC(raw: bigint): string {
-  return (Number(raw) / 1e6).toFixed(2);
+  const num = Number(raw) / 1e6;
+  const truncated = Math.floor(num * 100) / 100;
+  return truncated.toLocaleString(undefined, {
+    minimumFractionDigits: truncated % 1 === 0 ? 0 : 2,
+    maximumFractionDigits: 2,
+  });
 }
 
 /** Convert basis points to percentage string */

@@ -74,9 +74,9 @@ export function LoanTerms({
           </div>
         </Card>
 
-        <Card className="border-none bg-primary text-primary-foreground p-5">
-          <p className="text-[10px] font-mono tracking-widest text-primary-foreground/50 uppercase mb-1">Capital Saved</p>
-          <span className="heading-3 text-[var(--color-sage)] font-bold">
+        <Card className="border-none bg-[var(--color-sage-light)] p-5">
+          <p className="text-[10px] font-mono tracking-widest text-[var(--color-sage-text)]/70 uppercase mb-1">Capital Saved</p>
+          <span className="heading-3 text-[var(--color-sage-text)] font-bold">
             ${pricingDetails.capitalFreedUsd.toLocaleString()}
           </span>
         </Card>

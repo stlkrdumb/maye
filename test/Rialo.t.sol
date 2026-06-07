@@ -300,10 +300,10 @@ contract RialoLendingPoolTest is Test {
         loanId = uint256(keccak256(abi.encodePacked(borrower, borrowAmount, borrowTimestamp, borrowCounter)));
         vm.stopPrank();
 
-        // Crash WETH price from $3000 to $2000 (USDC/USD)
-        // 13.4 WETH is now worth only $26,800, which is below required $40,200!
+        // Crash RLO price from $3000 to $2000 (USDC/USD)
+        // 13.4 RLO is now worth only $26,800, which is below required $40,200!
         vm.prank(owner);
-        pool.setWethPrice(2000 * USDC_PRECISION);
+        pool.setRloPeg(2000 * USDC_PRECISION);
 
         uint256 repayDebt = pool.calculateRepaymentAmount(loanId);
 

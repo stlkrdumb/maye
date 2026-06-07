@@ -339,7 +339,7 @@ export const bAYEABI = [
 export const RialoLendingPoolABI = [
   {
     inputs: [],
-    name: "wethPrice",
+    name: "rloPeg",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
@@ -361,7 +361,7 @@ export const RialoLendingPoolABI = [
     ],
     name: "computeCollateralNeeded",
     outputs: [
-      { internalType: "uint256", name: "collateralWeth", type: "uint256" },
+      { internalType: "uint256", name: "collateralRlo", type: "uint256" },
       { internalType: "uint256", name: "ratio", type: "uint256" },
     ],
     stateMutability: "view",

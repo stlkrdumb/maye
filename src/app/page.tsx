@@ -73,8 +73,7 @@ export default function HomePage() {
             variants={itemVariants}
             className="text-xl md:text-2xl text-[var(--ink-muted)] leading-relaxed mb-12 max-w-2xl"
           >
-            maye sequences your financial DNA using <span className="text-[var(--ink)] font-semibold">Zero-Knowledge Proofs</span> to unlock fair, 
-            unsecured credit. Cryptographically private, trustless, and friction-free.
+            maye uses Zero-Knowledge and cryptographic attestations to unlock dynamic, under-collateralized loans. Lower your collateral requirements and borrow rates privately and securely on-chain.
           </motion.p>
 
           <motion.div 
@@ -83,7 +82,7 @@ export default function HomePage() {
           >
             <Link href="/apply">
               <Button className="h-14 px-10 btn-primary !rounded-full shadow-lg shadow-[var(--color-sage)]/10 hover:shadow-xl hover:shadow-[var(--color-sage)]/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
-                Verify Your DNA
+                Verify Credentials
               </Button>
             </Link>
 
@@ -280,7 +279,7 @@ export default function HomePage() {
             whileInView={{ opacity: 1, y: 0 }}
             className="heading-display mb-8"
           >
-            Ready to sequence?
+            Ready to borrow?
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -288,7 +287,7 @@ export default function HomePage() {
             transition={{ delay: 0.1 }}
             className="text-xl text-[var(--ink-muted)] mb-12"
           >
-            Get your AI Credit Score and access liquidity in under 3 minutes.
+            Verify your credentials and access under-collateralized liquidity in under 3 minutes.
           </motion.p>
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -316,12 +315,12 @@ export default function HomePage() {
             <div>
               <span className="heading-3 !text-xl lowercase tracking-tighter">maye</span>
               <p className="text-xs text-[var(--ink-muted)] mt-1 font-mono uppercase tracking-widest opacity-60">
-                AI Credit Protocol
+                Consumer Lending Portal
               </p>
             </div>
           </div>
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-16 gap-y-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-8">
             <div>
               <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--ink-muted)] mb-6">Protocol</p>
               <ul className="space-y-3">
@@ -339,9 +338,17 @@ export default function HomePage() {
               </ul>
             </div>
             <div>
+              <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--ink-muted)] mb-6">Rialo</p>
+              <ul className="space-y-3">
+                <li><a href="https://rialo.io/" target="_blank" rel="noopener noreferrer" className="text-sm text-[var(--ink-muted)] hover:text-[var(--ink)] transition-colors">Rialo Website</a></li>
+                <li><a href="https://rialo.io/for-devs" target="_blank" rel="noopener noreferrer" className="text-sm text-[var(--ink-muted)] hover:text-[var(--ink)] transition-colors">For Developers</a></li>
+                <li><a href="https://rialo.io/docs" target="_blank" rel="noopener noreferrer" className="text-sm text-[var(--ink-muted)] hover:text-[var(--ink)] transition-colors">Documentation</a></li>
+              </ul>
+            </div>
+            <div>
               <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--ink-muted)] mb-6">Social</p>
               <ul className="space-y-3">
-                {["Twitter", "GitHub", "Docs"].map(s => (
+                {["Twitter", "GitHub"].map(s => (
                   <li key={s}><a href="#" className="text-sm text-[var(--ink-muted)] hover:text-[var(--ink)] transition-colors">{s}</a></li>
                 ))}
               </ul>

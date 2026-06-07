@@ -10,9 +10,9 @@ import { cn } from "@/lib/utils";
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
-  title: "Maye — AI-Powered Unsecured Lending",
+  title: "Maye — Dynamic Under-Collateralized Lending",
   description:
-    "Consumer lending reimagined with AI credit assessment. Access loans based on your financial health, not just a credit score.",
+    "Consumer lending reimagined with cryptographic credential verification. Access loans with lower collateral requirements and interest rates based on your credentials.",
 };
 
 export default function RootLayout({

@@ -6,18 +6,46 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+function formatCompact(val: bigint, decimals: number): string {
+  const num = Number(val) / (10 ** decimals);
+  if (num >= 1_000_000_000) {
+    const formatted = num / 1_000_000_000;
+    return `${formatted % 1 === 0 ? formatted.toFixed(0) : formatted.toFixed(2)}B`;
+  }
+  if (num >= 1_000_000) {
+    const formatted = num / 1_000_000;
+    return `${formatted % 1 === 0 ? formatted.toFixed(0) : formatted.toFixed(2)}M`;
+  }
+  if (num >= 1_000) {
+    const formatted = num / 1_000;
+    return `${formatted % 1 === 0 ? formatted.toFixed(0) : formatted.toFixed(2)}K`;
+  }
+  return num.toLocaleString(undefined, {
+    minimumFractionDigits: num % 1 === 0 ? 0 : 2,
+    maximumFractionDigits: 2,
+  });
+}
+
 export function formatUSDC(val: bigint): string {
-  return Number(formatUnits(val, 6)).toLocaleString(undefined, {
-    minimumFractionDigits: 2,
+  const num = Number(formatUnits(val, 6));
+  const truncated = Math.floor(num * 100) / 100;
+  return truncated.toLocaleString(undefined, {
+    minimumFractionDigits: truncated % 1 === 0 ? 0 : 2,
     maximumFractionDigits: 2,
   });
 }
 
 export function formatRLO(val: bigint): string {
-  return Number(formatUnits(val, 18)).toLocaleString(undefined, {
-    minimumFractionDigits: 2,
+  const num = Number(formatUnits(val, 18));
+  const truncated = Math.floor(num * 100) / 100;
+  return truncated.toLocaleString(undefined, {
+    minimumFractionDigits: truncated % 1 === 0 ? 0 : 2,
     maximumFractionDigits: 2,
   });
+}
+
+export function formatCompactUSDC(val: bigint): string {
+  return formatCompact(val, 6);
 }
 
 export function timeAgo(ts: bigint): string {

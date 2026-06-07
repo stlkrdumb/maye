@@ -72,15 +72,7 @@ export function Checkout({
         </div>
       </Card>
 
-      {/* Faucet Box in case they run out of ETH gas */}
-      <div className="p-4 bg-muted border border-border rounded-lg mb-8 flex justify-between items-center text-xs font-mono">
-        <span className="text-muted-foreground">Gas/Liquidity faucet:</span>
-        <div className="flex gap-2">
-          <Button size="sm" onClick={faucets.requestUsdcFaucet} disabled={faucets.isMintingUsdc} variant="outline" className="h-7 text-[8px] uppercase tracking-widest">
-            {faucets.isMintingUsdc ? "Minting..." : "Mint USDC"}
-          </Button>
-        </div>
-      </div>
+
 
       {/* Checkout Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
@@ -147,7 +139,7 @@ export function Checkout({
       )}
 
       <div className="flex justify-start">
-        <Button onClick={onBack} variant="outline" disabled={borrowWrite.isBorrowing || borrowWrite.isApproving} className="px-6">← Edit Terms</Button>
+        <Button onClick={onBack} variant="outline" disabled={borrowWrite.isBorrowing || borrowWrite.isApproving} className="px-6 h-12">← Edit Terms</Button>
       </div>
     </>
   );

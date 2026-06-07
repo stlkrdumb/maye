@@ -118,20 +118,20 @@ export const staggerContainer = {
 export const HOME_FEATURES = [
   {
     step: "01",
-    title: "Sequence",
-    desc: "Link your bank data or on-chain history. Our AI analyzes patterns, not just points.",
+    title: "Verify",
+    desc: "Verify your bank details, credit score, or legal identity cryptographically via secure enclaves.",
     icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m7 11 2-2-2-2M11 19h10M15 9l2 2-2 2M3 13l2 2-2 2" /></svg>
   },
   {
     step: "02",
     title: "Attest",
-    desc: "Results are attested onchain to your address, creating a portable credit reputation.",
+    desc: "Attestations are recorded securely on-chain to your address, dynamically lowering your loan requirements.",
     icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
   },
   {
     step: "03",
-    title: "Deploy",
-    desc: "Receive USDC instantly from the liquidity pool based on your dynamic terms.",
+    title: "Borrow",
+    desc: "Lock RLO token collateral and borrow USDC instantly from the lending pool based on your custom terms.",
     icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
   }
 ];

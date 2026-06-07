@@ -38,7 +38,7 @@ interface TransactionCardProps {
 
 /** Formats a numeric string with thousand separators, preserving decimals. */
 function formatWithCommas(raw: string): string {
-  if (!raw || raw === "0") return "0";
+  if (!raw || raw === "0") return "";
   const parts = raw.split(".");
   const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   return parts.length > 1 ? `${intPart}.${parts[1]}` : intPart;
@@ -62,19 +62,22 @@ export function TransactionCard({
   onWithdraw,
   setMax,
 }: TransactionCardProps) {
-  const [inputValue, setInputValue] = useState(formatWithCommas(amount));
+  // Keep a separate local state for the formatted display value
+  // so that typing doesn't fight with the raw amount value
+  const [displayValue, setDisplayValue] = useState("");
 
-  // Sync input value whenever the amount prop changes (e.g. from MAX button)
+  // Sync display value whenever the amount prop changes (e.g. from MAX button)
   useEffect(() => {
-    setInputValue(formatWithCommas(amount));
+    setDisplayValue(formatWithCommas(amount));
   }, [amount]);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const raw = e.target.value.replace(/,/g, "");
-      // Only allow digits and at most one decimal point
-      if (/^\d*\.?\d*$/.test(raw)) {
+      // Only allow digits and at most two decimal places
+      if (/^\d*\.?\d{0,2}$/.test(raw)) {
         setAmount(raw);
+        setDisplayValue(raw);
       }
     },
     [setAmount],
@@ -138,7 +141,7 @@ export function TransactionCard({
                 type="text"
                 inputMode="decimal"
                 placeholder="0"
-                value={inputValue}
+                value={displayValue}
                 onChange={handleInputChange}
                 className="w-full text-center text-7xl font-bold bg-transparent border-none outline-none focus:ring-0 p-0 tracking-tighter placeholder:text-muted-foreground/10 appearance-none text-foreground selection:bg-accent"
                 autoFocus

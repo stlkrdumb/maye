@@ -9,6 +9,7 @@ import {
   useRialoFaucets,
   useUserLoans
 } from "@/hooks/useContracts";
+import { usePortfolioSummary } from "@/hooks/usePortfolioSummary";
 import { useToast } from "@/lib/providers/toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -38,6 +39,7 @@ export default function DashboardPage() {
 
   // Loan IDs from contract
   const userLoans = pool.userLoans.data as bigint[] | undefined;
+  const { summary } = usePortfolioSummary(userLoans);
   const liveCredentials = (pool.credentials.data as readonly boolean[]) || [false, false, false, false, false];
 
   // ── Toast Notifications ──
@@ -159,8 +161,8 @@ export default function DashboardPage() {
         </header>
 
         {/* Dashboard Summary (Command Center) */}
-        {userLoans && userLoans.length > 0 && (
-          <DashboardSummary loanIds={userLoans} />
+        {summary && summary.activeCount > 0 && (
+          <DashboardSummary loanIds={userLoans || []} />
         )}
 
         {/* Dashboard Grid */}
@@ -179,11 +181,11 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between px-2">
                 <h3 className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground">Active Borrowing Positions</h3>
                 <span className="text-[10px] font-mono text-muted-foreground opacity-40">
-                  {userLoans?.length || 0} position(s) detected
+                  {summary ? `${summary.activeCount} active position(s) detected` : "0 active position(s) detected"}
                 </span>
               </div>
 
-              {userLoans && userLoans.length > 0 ? (
+              {summary && summary.activeCount > 0 && userLoans ? (
                 <div className="grid gap-4">
                   {[...userLoans].reverse().map((id) => (
                     <LoanPositionCard key={id.toString()} loanId={id} userAddress={address as string} />

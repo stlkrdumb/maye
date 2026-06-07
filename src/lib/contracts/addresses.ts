@@ -7,11 +7,11 @@ import { baseSepolia } from "viem/chains";
 
 export const CONTRACT_ADDRESSES: Record<number, Partial<ContractAddresses>> = {
   [baseSepolia.id]: {
-    // Live Rialo Suite (RLO Collateralized) — redeployed Jun 6 2026 (TestUSDC no faucet, RLO faucet 10k)
-    rialoLendingPool: "0xFeB64f1024B8F776d9a66c452904D863315E2AA8",
-    credentialVerifier: "0x3c5EE8B883670Be1BA7ed83ac17C2c99994c8762",
-    mockRLO: "0xB6a14d169a69c97597E385288690e82AA39ca828",
-    testUSDC: "0x19fc415Cd4c0C68981E40c4A9C7688CEc485C624",
+    // Live Rialo Suite (RLO Collateralized) — redeployed Jun 7 2026 (new USDC 0x4aad...)
+    rialoLendingPool: "0x9B477864e3984b4Ec5067ba8f33611F0F315d061",
+    credentialVerifier: "0x20cCD66e203bdfd3B989Dc9283d0817c5f9765DE",
+    mockRLO: "0x1D26103b5a9d73A55b0bb080EBdCDbDfEAC6599B",
+    testUSDC: "0x4aadaE938D355b1F8E33ACa3cB3a2b3E8A8f6F27",
 
     // Legacy contracts preserved for backward compatibility
     lendingPool: "0xb219E15E2F52AC529B505AfC885C78496193885c", // Map lendingPool to old LendingPool

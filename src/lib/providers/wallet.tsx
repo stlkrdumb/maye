@@ -23,7 +23,7 @@ const customBaseSepolia = {
 export const baseSepoliaConfig = customBaseSepolia;
 
 const wagmiConfig = getDefaultConfig({
-  appName: "Maye — AI Lending Protocol",
+  appName: "Maye — Consumer Lending Portal",
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "your-walletconnect-id",
   chains: [customBaseSepolia],
   ssr: true,

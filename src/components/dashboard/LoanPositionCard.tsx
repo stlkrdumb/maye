@@ -11,8 +11,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/lib/providers/toast";
 import { useRialoPoolRead, useRialoLoanDetails, useRialoRepayWrite } from "@/hooks/useContracts";
-import { timeAgo, formatRLO } from "@/lib/utils";
-import { Clock, CheckCircle, RefreshCw, ShieldCheck, Calendar } from "lucide-react";
+import { timeAgo, formatRLO, formatUSDC } from "@/lib/utils";
+import { Clock, CheckCircle, RefreshCw, ShieldCheck, Calendar, Coins } from "lucide-react";
 
 interface LoanPositionCardProps {
   loanId: bigint;
@@ -87,8 +87,8 @@ export function LoanPositionCard({ loanId, userAddress }: LoanPositionCardProps)
     }
   }, [repayWrite.isRepaySuccess]);
 
-  const isLocalApproving = localApproveHash !== undefined;
-  const isLocalRepaying = localRepayHash !== undefined;
+  const isLocalApproving = localApproveHash !== undefined || repayWrite.isApproving;
+  const isLocalRepaying = localRepayHash !== undefined || repayWrite.isRepaying;
 
   // Reset states on mount (cleanup on unmount)
   useEffect(() => {
@@ -159,15 +159,14 @@ export function LoanPositionCard({ loanId, userAddress }: LoanPositionCardProps)
       <CardContent className="p-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="flex items-center gap-5">
-            <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--color-sage-light)]/30 to-[var(--color-sage-light)]/10 border border-[var(--color-sage)]/20 flex flex-col items-center justify-center font-mono shrink-0 group-hover:scale-105 group-hover:border-[var(--color-sage)]/40 transition-all duration-500 shadow-sm">
+            <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--color-sage-light)]/30 to-[var(--color-sage-light)]/10 border border-[var(--color-sage)]/20 flex items-center justify-center text-[var(--color-sage-text)] dark:text-[var(--color-sage)] shrink-0 group-hover:scale-105 group-hover:border-[var(--color-sage)]/40 transition-all duration-500 shadow-sm">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[var(--color-sage)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <span className="relative z-10 text-[6px] uppercase tracking-[0.25em] text-[var(--color-sage-text)]/60 dark:text-[var(--color-sage)]/60 leading-none">ID</span>
-              <span className="relative z-10 text-sm font-bold text-foreground leading-none">#{loanId.toString().slice(-4)}</span>
+              <Coins className="size-6 relative z-10" />
             </div>
             
             <div className="space-y-1">
               <div className="flex items-center gap-3">
-                <span className="heading-3 !text-lg font-mono text-foreground">${Number(formatUnits(borrowedAmount, 6)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDC</span>
+                <span className="heading-3 !text-lg font-mono text-foreground">${formatUSDC(borrowedAmount)} USDC</span>
                 {isOverdue ? (
                   <div className="px-3 py-1 rounded-full border border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400 text-[9px] font-mono font-bold tracking-widest uppercase flex items-center gap-2 shadow-sm">
                     <span className="relative flex h-2 w-2">
@@ -187,6 +186,12 @@ export function LoanPositionCard({ loanId, userAddress }: LoanPositionCardProps)
                 )}
               </div>
               
+              <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground opacity-60">
+                <span>Position ID: #{loanId.toString().slice(-8)}</span>
+                <span>•</span>
+                <span>Verified</span>
+              </div>
+
               <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] font-mono text-muted-foreground opacity-60">
                 <span>Issued {timeAgo(startTime)}</span>
                 <span>•</span>
@@ -217,8 +222,8 @@ export function LoanPositionCard({ loanId, userAddress }: LoanPositionCardProps)
             
             {repaymentRaw !== undefined && (
               <div className="flex justify-between text-[9px] font-mono text-muted-foreground opacity-60 mt-0.5">
-                <span>Principal: ${Number(formatUnits(borrowedAmount, 6)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                <span className="font-semibold text-foreground/80">Due: ${Number(formatUnits(repaymentRaw, 6)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span>Principal: ${formatUSDC(borrowedAmount)}</span>
+                <span className="font-semibold text-foreground/80">Due: ${formatUSDC(repaymentRaw)}</span>
               </div>
             )}
           </div>

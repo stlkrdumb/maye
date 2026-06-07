@@ -275,7 +275,7 @@ export default function ApplyPage() {
             />
 
             <div className="flex justify-between items-center pt-4 border-t border-border">
-              <Button onClick={() => setCurrentStep(0)} variant="outline" className="px-6">← Edit Trust Profile</Button>
+              <Button onClick={() => setCurrentStep(0)} variant="outline" className="px-6 h-12">← Edit Trust Profile</Button>
               <Button
                 onClick={() => setCurrentStep(2)}
                 disabled={poolRead.rloBalance.data === undefined || (poolRead.rloBalance.data as bigint) < requiredRloRaw}

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Wallet, Clock, AlertCircle, TrendingDown, Activity } from 'lucide-react';
-import { formatUSDC } from '@/lib/utils';
+import { formatCompactUSDC } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { usePortfolioSummary, PortfolioLoan } from '@/hooks/usePortfolioSummary';
@@ -50,7 +50,7 @@ export const DashboardSummary = ({ loanIds }: DashboardSummaryProps) => {
           
           <div className="bg-card/40 backdrop-blur-md border border-border/40 p-4 rounded-2xl hover:border-[var(--color-sage)]/20 transition-colors">
             <p className="text-[9px] font-mono text-muted-foreground uppercase tracking-widest mb-1">Total Active Debt</p>
-            <p className="text-xl font-bold text-foreground font-mono">${formatUSDC(summary.totalDebt)}</p>
+            <p className="text-xl font-bold text-foreground font-mono">${formatCompactUSDC(summary.totalDebt)}</p>
           </div>
         </div>
       </div>
@@ -84,10 +84,10 @@ export const DashboardSummary = ({ loanIds }: DashboardSummaryProps) => {
             </div>
             <div className="space-y-1">
               <p className="text-lg font-bold text-foreground font-mono">
-                {loanIds.length} Active Loans
+                {summary.activeCount} Active {summary.activeCount === 1 ? "Loan" : "Loans"}
               </p>
               <p className="text-xs text-muted-foreground font-mono">
-                {loanIds.length} borrowing positions are currently active and under management.
+                {summary.activeCount} borrowing {summary.activeCount === 1 ? "position is" : "positions are"} currently active and under management.
               </p>
             </div>
           </div>

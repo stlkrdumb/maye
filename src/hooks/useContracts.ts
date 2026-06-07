@@ -199,8 +199,8 @@ export function usePoolWrite(address?: string) {
   const poolAddress = address ? getContractAddress(baseSepolia.id, "lendingPool") : undefined;
   const hasPool = !!poolAddress && poolAddress !== "0x0000000000000000000000000000000000000000";
 
-  const { writeContractAsync, data: approveHash } = useWriteContract();
-  const { writeContractAsync: depositAsync, data: depositHash } = useWriteContract();
+  const { writeContractAsync, data: approveHash, isPending: isApproving } = useWriteContract();
+  const { writeContractAsync: depositAsync, data: depositHash, isPending: isDepositing } = useWriteContract();
 
   const isApproved = useWaitForTransactionReceipt({ hash: approveHash });
   const isDeposited = useWaitForTransactionReceipt({ hash: depositHash });
@@ -244,6 +244,8 @@ export function usePoolWrite(address?: string) {
     depositHash,
     isApproved: isApproved.data?.status === "success",
     isDeposited: isDeposited.data?.status === "success",
+    isApproving: isApproving || isApproved.isLoading,
+    isDepositing: isDepositing || isDeposited.isLoading,
   };
 }
 
@@ -255,8 +257,8 @@ export function usePoolWriteExtended(address?: string) {
     : undefined;
   const hasPool = !!poolAddress && poolAddress !== "0x0000000000000000000000000000000000000000";
 
-  const { writeContractAsync, data: repayHash } = useWriteContract();
-  const { writeContractAsync: withdrawAsync, data: withdrawHash } = useWriteContract();
+  const { writeContractAsync, data: repayHash, isPending: isRepaying } = useWriteContract();
+  const { writeContractAsync: withdrawAsync, data: withdrawHash, isPending: isWithdrawing } = useWriteContract();
 
   const isRepaid = useWaitForTransactionReceipt({ hash: repayHash });
   const isWithdrawn = useWaitForTransactionReceipt({ hash: withdrawHash });
@@ -288,6 +290,8 @@ export function usePoolWriteExtended(address?: string) {
     withdrawHash,
     isRepaid: isRepaid.data?.status === "success",
     isWithdrawn: isWithdrawn.data?.status === "success",
+    isRepaying: isRepaying || isRepaid.isLoading,
+    isWithdrawing: isWithdrawing || isWithdrawn.isLoading,
   };
 }
 
@@ -318,7 +322,7 @@ export function useBorrowWrite(address?: string) {
     applyAndBorrow,
     borrowHash,
     borrowError,
-    isBorrowing,
+    isBorrowing: isBorrowing || isConfirmed.isLoading,
     isConfirmed: isConfirmed.data?.status === "success",
     receipt: isConfirmed.data,
   };
@@ -440,7 +444,7 @@ export function useRialoPoolRead(userAddress?: string) {
   const collateralPrice = useReadContract({
     address: poolAddr,
     abi: RialoLendingPoolABI,
-    functionName: "wethPrice",
+    functionName: "rloPeg",
     query: { refetchInterval: 2000 },
   });
 
@@ -578,8 +582,8 @@ export function useRialoBorrowWrite() {
     borrowHash,
     approveError,
     borrowError,
-    isApproving,
-    isBorrowing,
+    isApproving: isApproving || isApproveConfirmed.isLoading,
+    isBorrowing: isBorrowing || isBorrowConfirmed.isLoading,
     isApproveSuccess: isApproveConfirmed.data?.status === "success",
     isBorrowSuccess: isBorrowConfirmed.data?.status === "success",
     borrowReceipt: isBorrowConfirmed.data,
@@ -626,8 +630,8 @@ export function useRialoRepayWrite() {
     repayHash,
     approveError,
     repayError,
-    isApproving,
-    isRepaying,
+    isApproving: isApproving || isApproveConfirmed.isLoading,
+    isRepaying: isRepaying || isRepayConfirmed.isLoading,
     isApproveSuccess: isApproveConfirmed.data?.status === "success",
     isRepaySuccess: isRepayConfirmed.data?.status === "success",
   };
@@ -723,7 +727,7 @@ export function useCredentialVerifierWrite() {
     verifyAndRecord,
     txHash,
     error,
-    isPending,
+    isPending: isPending || txConfirmed.isLoading,
     isConfirmed: txConfirmed.data?.status === "success",
   };
 }

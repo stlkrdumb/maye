@@ -21,21 +21,46 @@ export default function LendPage() {
   // ── Toast Notifications loop ──
   const { success: showSuccess, error: showError, pending: showPending } = useToast();
 
+  // UI State
+  const [amount, setAmount] = useState("");
+  const [activeTab, setActiveTab] = useState<"deposit" | "withdraw">("deposit");
+  const [error, setError] = useState<string | null>(null);
+  const [localIsProcessing, setIsProcessing] = useState(false);
+  const isProcessing = localIsProcessing || supply.isApproving || supply.isDepositing || manage.isWithdrawing;
+  const [isAwaitingApproval, setIsAwaitingApproval] = useState(false);
+
   // Watch Supply/Deposit confirmations
   useEffect(() => {
     if (supply.approveHash) {
       if (supply.isApproved) {
-        showSuccess("Approval Confirmed", "USDC authorized for supply deposits.", supply.approveHash);
+        showSuccess("USDC Approved", "Lending pool authorized to accept USDC.", supply.approveHash);
       } else {
         showPending("Approving USDC", "Authorizing pool to supply USDC...", supply.approveHash);
       }
     }
   }, [supply.approveHash, supply.isApproved]);
 
+  // Auto-deposit after approval confirms
+  useEffect(() => {
+    if (supply.isApproved && isAwaitingApproval && amount) {
+      console.log("[Lend] Auto-deposit triggered: isApproved=", supply.isApproved, "amount=", amount);
+      setIsAwaitingApproval(false);
+      const units = parseUnits(amount, 6);
+      supply.deposit(units).then(() => {
+        console.log("[Lend] Auto-deposit tx submitted");
+      }).catch((err) => {
+        console.error("[Lend] Auto-deposit error:", err);
+        setError(err?.message || "Deposit failed");
+        setIsProcessing(false);
+      });
+    }
+  }, [supply.isApproved, isAwaitingApproval, amount]);
+
   useEffect(() => {
     if (supply.depositHash) {
       if (supply.isDeposited) {
         showSuccess("Capital Supplied!", "USDC supplied. You are now earning dynamic APY yield.", supply.depositHash);
+        setIsProcessing(false);
       } else {
         showPending("Supplying Capital", "Depositing USDC into vault on-chain...", supply.depositHash);
       }
@@ -52,12 +77,6 @@ export default function LendPage() {
       }
     }
   }, [manage.withdrawHash, manage.isWithdrawn]);
-
-  // UI State
-  const [amount, setAmount] = useState("");
-  const [activeTab, setActiveTab] = useState<"deposit" | "withdraw">("deposit");
-  const [error, setError] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
 
   // Data Extraction
   const totalDeposits = pool.totalDeposits.data as bigint | undefined;
@@ -119,17 +138,27 @@ export default function LendPage() {
     setIsProcessing(true);
     try {
       const units = parseUnits(amount, 6);
+      console.log("[Lend] Deposit flow: isApproved=", supply.isApproved, "amount=", amount, "units=", units.toString());
       if (!supply.isApproved) {
+        console.log("[Lend] Step 1: Approving USDC...");
+        setIsAwaitingApproval(true);
         await supply.approve(units);
+        console.log("[Lend] Approval tx submitted");
       } else {
+        console.log("[Lend] Step 2: Depositing USDC...");
         await supply.deposit(units);
+        console.log("[Lend] Deposit tx submitted");
         setAmount("");
       }
     } catch (err) {
       const error = err as Error;
+      console.error("[Lend] Deposit error:", error);
       setError(error.message || "Transaction failed");
+      setIsAwaitingApproval(false);
     } finally {
-      setIsProcessing(false);
+      if (!isAwaitingApproval) {
+        setIsProcessing(false);
+      }
     }
   };
 
@@ -152,11 +181,13 @@ export default function LendPage() {
   const setMax = () => {
     if (activeTab === "deposit") {
       if (usdcBalRaw) {
-        setAmount((Number(usdcBalRaw as bigint) / 1e6).toString());
+        const amt = Math.floor(Number(usdcBalRaw as bigint) / 10000) / 100;
+        setAmount(amt.toFixed(2));
       }
     } else {
       if (userDeposit) {
-        setAmount((Number(userDeposit) / 1e6).toString());
+        const amt = Math.floor(Number(userDeposit) / 10000) / 100;
+        setAmount(amt.toFixed(2));
       }
     }
   };
@@ -237,6 +268,7 @@ export default function LendPage() {
             setAmount={setAmount}
             usdcDisplay={usdcDisplay}
             userDepositDisplay={userDepositDisplay}
+            userDeposit={userDeposit}
             estimatedYieldYearly={estimatedYieldYearly}
             isConnected={isConnected}
             isProcessing={isProcessing}
@@ -266,7 +298,7 @@ export default function LendPage() {
           {[
             { title: "On-Chain Settlements", desc: "Every yield payment is settled instantly on Base Sepolia, verifiable by anyone." },
             { title: "Variable APY", desc: "Rates adjust dynamically based on pool utilization and borrower risk profiles." },
-            { title: "Zero Collateral", desc: "Maye is built for consumer credit, relying on AI-vetted financial DNA." }
+            { title: "Dynamic Collateral", desc: "Borrowers verify credentials to lower LTV requirements, backed securely by RLO collateral." }
           ].map((item, i) => (
             <div key={i}>
               <h5 className="font-semibold text-sm mb-2 text-foreground">{item.title}</h5>
@@ -282,6 +314,9 @@ export default function LendPage() {
 function formatPrettyUSDC(val: bigint | undefined): string {
   if (val === undefined) return "0";
   const num = Number(val) / 1e6;
+  if (num >= 1_000_000_000) return `${(num / 1_000_000_000).toFixed(2)}B`;
+  if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(2)}M`;
+  if (num >= 1_000) return `${(num / 1_000).toFixed(2)}K`;
   return num.toLocaleString("en-US", {
     minimumFractionDigits: num % 1 === 0 ? 0 : 2,
     maximumFractionDigits: 2,
