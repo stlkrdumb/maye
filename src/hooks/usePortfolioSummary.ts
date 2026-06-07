@@ -112,12 +112,14 @@ export function usePortfolioSummary(loanIds: bigint[] | undefined) {
           .sort((a, b) => (a < b ? -1 : 1));
         const nextDue = dueDates[0] || 0n;
 
-        // Calculate live collateral ratio based on RLO price (rloPeg)
-        // liveRatioPercent = (collateralLocked * rloPeg / 10^18) * 100 / repaymentAmount
+        // Calculate live collateral health factor relative to required collateral ratio
+        // healthFactorPercent = (liveCollateralValueUSDC * 100) / requiredCollateralValueUSDC
+        // where requiredValueUsdc = (borrowedAmount * collateralRatio) / 10000
         const ratios = results.map(loan => {
           const collateralValueUsdc = (loan.collateralLocked * rloPeg) / 10n**18n; // 6 decimals
-          if (loan.repaymentAmount === 0n) return 150;
-          return Number((collateralValueUsdc * 10000n) / loan.repaymentAmount) / 100;
+          const requiredValueUsdc = (loan.borrowedAmount * loan.collateralRatio) / 10000n; // 6 decimals
+          if (requiredValueUsdc === 0n) return 150;
+          return Number((collateralValueUsdc * 10000n) / requiredValueUsdc) / 100;
         });
 
         const minRatio = ratios.length > 0 ? Math.min(...ratios) : 150;
