@@ -41,9 +41,9 @@ export const DashboardSummary = ({ loanIds }: DashboardSummaryProps) => {
           <div className="bg-card/40 backdrop-blur-md border border-border/40 p-4 rounded-2xl hover:border-[var(--color-sage)]/20 transition-colors">
             <p className="text-[9px] font-mono text-muted-foreground uppercase tracking-widest mb-1">Portfolio Health</p>
             <div className="flex items-center gap-2">
-              <div className={`h-2 w-2 rounded-full ${summary.minRatio < 110 ? 'bg-red-500 animate-pulse' : summary.minRatio < 140 ? 'bg-yellow-500' : 'bg-emerald-500'}`} />
-              <span className={`text-lg font-bold ${summary.minRatio < 110 ? 'text-red-500' : summary.minRatio < 140 ? 'text-yellow-500' : 'text-emerald-500'}`}>
-                {summary.minRatio >= 100 ? `${summary.minRatio.toFixed(1)}%` : 'CRITICAL'}
+              <div className={`h-2 w-2 rounded-full ${summary.minRatio < 100 ? 'bg-red-500 animate-pulse' : summary.minRatio < 115 ? 'bg-yellow-500' : 'bg-emerald-500'}`} />
+              <span className={`text-lg font-bold ${summary.minRatio < 100 ? 'text-red-500' : summary.minRatio < 115 ? 'text-yellow-500' : 'text-emerald-500'}`}>
+                {summary.minRatio.toFixed(1)}%
               </span>
             </div>
           </div>
