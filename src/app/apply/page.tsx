@@ -105,7 +105,15 @@ export default function ApplyPage() {
     reporting: liveCredentials[4],
   }), [liveCredentials]);
 
-  const pricingDetails = useMemo(() => computeCollateralDetails(mappedCredState, borrowAmount, 1.0), [mappedCredState, borrowAmount]);
+  const liveRloPriceNum = useMemo(() => {
+    return poolRead.collateralPrice.data 
+      ? Number(poolRead.collateralPrice.data) / 1e6 
+      : 0.10; // Default to $0.10 if not loaded yet
+  }, [poolRead.collateralPrice.data]);
+
+  const pricingDetails = useMemo(() => 
+    computeCollateralDetails(mappedCredState, borrowAmount, liveRloPriceNum), 
+  [mappedCredState, borrowAmount, liveRloPriceNum]);
   const rloBalanceDisplay = useMemo(() => poolRead.rloBalance.data ? Number(formatUnits(poolRead.rloBalance.data as bigint, 18)).toLocaleString(undefined, { maximumFractionDigits: 2 }) : "0.00", [poolRead.rloBalance.data]);
   const requiredRloRaw = parseUnits(pricingDetails.collateralRlo.toString(), 18);
   const currentRloAllowance = (poolRead.rloAllowance.data as bigint) || 0n;
