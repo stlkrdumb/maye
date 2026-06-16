@@ -7,7 +7,9 @@ import "../../contracts/Tokens/mAYE.sol";
 import "../../contracts/Tokens/TestUSDC.sol";
 import "../../contracts/Tokens/bAYE.sol";
 import "../../contracts/Tokens/MAYEGov.sol";
+import "../../contracts/Tokens/MockRLO.sol";
 import "../../contracts/LendingPool.sol";
+import "../../contracts/RialoLendingPool.sol";
 import "../../contracts/CredentialVerifier.sol";
 
 /// @title Deploy — Deploys all Maye contracts to Base Sepolia
@@ -22,6 +24,8 @@ contract Deploy is Script {
     bAYE public debtToken;
     MayeLendingPool public lendingPool;
     CredentialVerifier public credentialVerifier;
+    MockRLO public mockRLO;
+    RialoLendingPool public rialoLendingPool;
 
     function setUp() public {}
 
@@ -70,12 +74,30 @@ contract Deploy is Script {
         
         // 9. Enable initial reward rate (e.g. 0.001 MAYE/s = 1e15 wei)
         mayeGovToken.setRewardRate(1_000_000_000_000_000);
+
+        // 10. Deploy MockRLO (collateral token)
+        mockRLO = new MockRLO(deployer);
+        console.log("MockRLO deployed at:", address(mockRLO));
+
+        // 11. Deploy RialoLendingPool
+        rialoLendingPool = new RialoLendingPool(
+            address(mockRLO),
+            address(testUSDC),
+            address(credentialVerifier),
+            100000, // $0.10 initial peg (6 decimals)
+            deployer
+        );
+        console.log("RialoLendingPool deployed at:", address(rialoLendingPool));
+
+        // 12. Fund RialoLendingPool with USDC liquidity so it can offer loans
+        testUSDC.mint(address(rialoLendingPool), 5_000_000 * 1e6); // $5M USDC
+        console.log("RialoLendingPool seeded with 5,000,000 USDC liquidity.");
         
         console.log("Protocol logic linked and permissions set.");
 
         vm.stopBroadcast();
 
-        // 10. Log deployment summary
+        // 13. Log deployment summary
         console.log("\n=== Deployment Summary ===");
         console.log("TestUSDC:", address(testUSDC));
         console.log("BorrowerRegistry:", address(borrowerRegistry));
@@ -84,6 +106,8 @@ contract Deploy is Script {
         console.log("mAYE Receipt Token:", address(mayeToken));
         console.log("MAYEGov Reward Token:", address(mayeGovToken));
         console.log("LendingPool:", address(lendingPool));
+        console.log("MockRLO:", address(mockRLO));
+        console.log("RialoLendingPool:", address(rialoLendingPool));
         console.log("==========================\n");
 
         // Write deployment data to a JSON file for frontend consumption
@@ -98,6 +122,8 @@ contract Deploy is Script {
         json = vm.serializeAddress(json, "mAYE", address(mayeToken));
         json = vm.serializeAddress(json, "mayeGovernance", address(mayeGovToken));
         json = vm.serializeAddress(json, "lendingPool", address(lendingPool));
+        json = vm.serializeAddress(json, "mockRLO", address(mockRLO));
+        json = vm.serializeAddress(json, "rialoLendingPool", address(rialoLendingPool));
         console.log("Deployment addresses:");
         console.log(json);
     }

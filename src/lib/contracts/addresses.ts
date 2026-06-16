@@ -7,18 +7,16 @@ import { baseSepolia } from "viem/chains";
 
 export const CONTRACT_ADDRESSES: Record<number, Partial<ContractAddresses>> = {
   [baseSepolia.id]: {
-    // Live Rialo Suite (RLO Collateralized) — redeployed Jun 7 2026
-    rialoLendingPool: "0x9B477864e3984b4Ec5067ba8f33611F0F315d061", // Note: Need to redeploy Rialo Pool if needed, but for now we keep existing
-    mockRLO: "0x1D26103b5a9d73A55b0bb080EBdCDbDfEAC6599B",
-
-    // Fresh Deployment with MAYEGov Integration
-    testUSDC: "0xED66e7258c40bD604bfB35bf1863e7F685393d20",
-    lendingPool: "0xC545ccCae89B714050ade996FD0E70B8500b8942",
-    mAYE: "0xC69eBC03f264a0a0c31d5a35b6b0b11Cfb93A125",
-    borrowerRegistry: "0x2c0FBD143372d27dc820aE5e2e647245Cffb325C",
-    credentialVerifier: "0x83804cc2EB15E15d8e2548F328Ef8C48EE6B744e",
-    bAYE: "0x0a8d26696a79230eA25a3c16abA102b7fa608661",
-    mayeGovernance: "0xd37C6F8e8a79e2E404382a65cA85f10f5895df51",
+    // Fresh Deployment with MAYEGov Integration (Fully Linked)
+    rialoLendingPool: "0x14Ff0e872699317141329FdC3C6C50217B94825B",
+    mockRLO: "0xB925Fa94d142116888908bADBDF2EFce1C85ADa6",
+    testUSDC: "0x92d4eD116d637f0808a143C2B233729261C8DF62",
+    lendingPool: "0x223165c524650D2384Dd865a3F78FEcA5eD5dc74",
+    mAYE: "0x1D3CC690Ff1de7EbdA71B4e06830268B54BEFed6",
+    borrowerRegistry: "0x3C0c73214eEbf5351902D1339B19C93f367169fE",
+    credentialVerifier: "0x37Ed620cEe2d87ED07db5a6c1A9d14FcE8684D48",
+    bAYE: "0x0a8Eb26e7c5996111C6aCbF30762F3C39E1fC883",
+    mayeGovernance: "0x6CF04Cf7d754716c8510675D73573ED0D8501992",
   },
 };
 
