@@ -7,7 +7,8 @@ import { getContractAddress } from "@/lib/contracts/addresses";
 import { baseSepolia } from "viem/chains";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, ExternalLink, RefreshCw } from "lucide-react";
+import { ExternalLink, RefreshCw } from "lucide-react";
+import { MAYELogo } from "@/components/icons";
 
 interface ClaimLog {
   amount: string;
@@ -65,7 +66,7 @@ export function MayeRewardHistory() {
         {/* Header */}
         <div className="flex items-center justify-between pb-2 border-b border-border/20">
           <div className="flex items-center gap-2">
-            <Sparkles className="size-4 text-[var(--color-sage-text)]" />
+            <MAYELogo className="size-4" />
             <h4 className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground font-semibold">
               MAYE Rewards Claim History
             </h4>

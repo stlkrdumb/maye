@@ -4,9 +4,10 @@ import { useAccount } from "wagmi";
 import { formatUnits } from "viem";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Clock, TrendingUp } from "lucide-react";
+import { Clock, TrendingUp } from "lucide-react";
 import { useMayeRewards } from "@/hooks/useMayeRewards";
 import { useToast } from "@/lib/providers/toast";
+import { MAYELogo } from "@/components/icons";
 
 export function MayeRewardCard() {
   const { address, isConnected } = useAccount();
@@ -38,7 +39,7 @@ export function MayeRewardCard() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="size-4 text-[var(--color-sage-text)]" />
+            <MAYELogo className="size-4" />
             <h3 className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground font-semibold">
               MAYE Rewards
             </h3>

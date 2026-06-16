@@ -35,3 +35,13 @@ export function ETHLogo({ className = "size-6" }: { className?: string }) {
     </svg>
   );
 }
+
+export function MAYELogo({ className = "size-6" }: { className?: string }) {
+  return (
+    <img 
+      src="/logo.svg" 
+      alt="MAYE Logo" 
+      className={`${className} object-contain`} 
+    />
+  );
+}

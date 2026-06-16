@@ -19,15 +19,14 @@ import {
   Clock,
   Fingerprint,
   ShieldCheck,
-  Lock,
-  Sparkles
+  Lock
 } from "lucide-react";
 import { DashboardSummary } from "@/components/dashboard/DashboardSummary";
 import { DashboardStat } from "@/components/dashboard/DashboardStat";
 import { LoanPositionCard } from "@/components/dashboard/LoanPositionCard";
 import { useMayeRewards } from "@/hooks/useMayeRewards";
 import { MayeRewardHistory } from "@/components/dashboard/MayeRewardHistory";
-import { USDCLogo, ETHLogo, RLOLogo } from "@/components/icons";
+import { USDCLogo, ETHLogo, RLOLogo, MAYELogo } from "@/components/icons";
 import { formatUSDC, formatRLO, timeAgo } from "@/lib/utils";
 
 /* ── Main Dashboard Page ────────────────────────────────────────── */
@@ -209,8 +208,8 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center justify-between py-4">
                     <div className="flex items-center gap-4">
-                      <div className="size-8 rounded-full bg-[var(--color-sage-light)]/20 text-[var(--color-sage-text)] border border-[var(--color-sage)]/30 flex items-center justify-center">
-                        <Sparkles className="size-4" />
+                      <div className="size-8 p-1 rounded-full bg-[var(--color-sage-light)]/20 border border-[var(--color-sage)]/30 flex items-center justify-center">
+                        <MAYELogo className="size-5" />
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-foreground">MAYE</p>
