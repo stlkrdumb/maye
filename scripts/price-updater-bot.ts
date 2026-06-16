@@ -11,7 +11,7 @@ dotenv.config();
 const UNISWAP_V2_PAIR_ADDRESS = "0x0000000000000000000000000000000000000000" as const; 
 
 // 2. The RialoLendingPool address that needs to be updated
-const RIALO_LENDING_POOL = "0x14Ff0e872699317141329FdC3C6C50217B94825B" as const; // Your live Rialo Pool
+const RIALO_LENDING_POOL = "0x008633b8E4Dc1Ede02A8AA23B45854f40c4426e2" as const; // Your live Rialo Pool
 
 // 3. Admin Key (from .env)
 const PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY as `0x${string}`;

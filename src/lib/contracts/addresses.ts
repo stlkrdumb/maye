@@ -8,15 +8,15 @@ import { baseSepolia } from "viem/chains";
 export const CONTRACT_ADDRESSES: Record<number, Partial<ContractAddresses>> = {
   [baseSepolia.id]: {
     // Fresh Deployment with MAYEGov Integration (Fully Linked)
-    rialoLendingPool: "0x14Ff0e872699317141329FdC3C6C50217B94825B",
-    mockRLO: "0xB925Fa94d142116888908bADBDF2EFce1C85ADa6",
-    testUSDC: "0x92d4eD116d637f0808a143C2B233729261C8DF62",
-    lendingPool: "0x223165c524650D2384Dd865a3F78FEcA5eD5dc74",
-    mAYE: "0x1D3CC690Ff1de7EbdA71B4e06830268B54BEFed6",
-    borrowerRegistry: "0x3C0c73214eEbf5351902D1339B19C93f367169fE",
-    credentialVerifier: "0x37Ed620cEe2d87ED07db5a6c1A9d14FcE8684D48",
-    bAYE: "0x0a8Eb26e7c5996111C6aCbF30762F3C39E1fC883",
-    mayeGovernance: "0x6CF04Cf7d754716c8510675D73573ED0D8501992",
+    rialoLendingPool: "0x008633b8E4Dc1Ede02A8AA23B45854f40c4426e2",
+    mockRLO: "0xEc3185aFbc31F2e50b5B36BB2E7afB1fC5820d64",
+    testUSDC: "0x6f402aa1285e010fbc5FAc5F176Ed5c5c27D5E0C",
+    lendingPool: "0xfdfDBb377CcC6CFC0DB54aaAC850A67869949053",
+    mAYE: "0xA68811e410955bb1a399074a0BbaAaF56b48Ec9F",
+    borrowerRegistry: "0x5f74E514A74Cc49620AB9e3dE5f57C3a917A8f8b",
+    credentialVerifier: "0xC4b57f451f510437Aac43093E96eE73b3D86C3bf",
+    bAYE: "0x1c17740478ebfc1c50eb48B540FAC533F67df019",
+    mayeGovernance: "0xD63A89A014f37c229E25d2fb85c88a3479e50583",
   },
 };
 
