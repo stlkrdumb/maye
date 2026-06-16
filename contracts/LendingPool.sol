@@ -7,6 +7,8 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 import "./interfaces/ICreditOracle.sol";
 import "./Tokens/bAYE.sol";
+import "./Tokens/MAYEGov.sol";
+import "./CredentialVerifier.sol";
 
 /**
  * @title MayeLendingPool
@@ -47,6 +49,8 @@ contract MayeLendingPool is Ownable, ReentrancyGuard, Pausable {
     IERC20 public immutable lendingToken;
     ICreditOracle public creditOracle;
     bAYE public debtToken;
+    MAYEGov public mayeRewardToken;
+    CredentialVerifier public credentialVerifier;
 
     uint256 public totalDeposits;
     uint256 public totalBorrows;
@@ -67,6 +71,8 @@ contract MayeLendingPool is Ownable, ReentrancyGuard, Pausable {
     event PoolConfigUpdated(PoolConfig config);
     event CreditOracleSet(address oracleAddress);
     event DebtTokenSet(address debtTokenAddress);
+    event RewardTokenSet(address indexed rewardToken);
+    event CredentialVerifierSet(address indexed verifier);
 
     // ---- Constructor ----
 
@@ -94,6 +100,9 @@ contract MayeLendingPool is Ownable, ReentrancyGuard, Pausable {
         deposits[msg.sender].amount += amount;
         totalDeposits += amount;
 
+        // Reward tracking - record BEFORE external transfer to follow CEI
+        _recordDepositForReward(msg.sender);
+
         require(lendingToken.transferFrom(msg.sender, address(this), amount), "Transfer failed");
         emit Deposit(msg.sender, amount);
     }
@@ -106,6 +115,9 @@ contract MayeLendingPool is Ownable, ReentrancyGuard, Pausable {
         // CEI Pattern
         deposits[msg.sender].amount -= amount;
         totalDeposits -= amount;
+
+        // Reward tracking - record BEFORE external transfer to follow CEI
+        _recordDepositForReward(msg.sender);
 
         require(lendingToken.transfer(msg.sender, amount), "Transfer failed");
         emit Withdrawal(msg.sender, amount);
@@ -194,6 +206,18 @@ contract MayeLendingPool is Ownable, ReentrancyGuard, Pausable {
         emit DebtTokenSet(_debtToken);
     }
 
+    function setRewardToken(address _rewardToken) external onlyOwner {
+        require(_rewardToken != address(0), "Zero address");
+        mayeRewardToken = MAYEGov(_rewardToken);
+        emit RewardTokenSet(_rewardToken);
+    }
+
+    function setCredentialVerifier(address _verifier) external onlyOwner {
+        require(_verifier != address(0), "Zero address");
+        credentialVerifier = CredentialVerifier(_verifier);
+        emit CredentialVerifierSet(_verifier);
+    }
+
     function updatePoolConfig(PoolConfig calldata newConfig) external onlyOwner {
         poolConfig = newConfig;
         emit PoolConfigUpdated(newConfig);
@@ -243,5 +267,47 @@ contract MayeLendingPool is Ownable, ReentrancyGuard, Pausable {
     function _calculateRepayment(uint256 principal, uint256 rate) internal pure returns (uint256) {
         // (Principal * (1 + rate/10000))
         return principal + (principal * rate) / 10000;
+    }
+
+    /**
+     * @notice Calculate MAYE reward multiplier based on borrower's verified credentials.
+     *         Each verified credential adds 8% (800 basis points).
+     *         All 5 verified: additional 120% (12000 basis points) combo bonus.
+     *         Total range: 1.0x (0 creds) to 2.6x (5 creds = +160% total).
+     */
+    function getRewardMultiplier(address user) public view returns (uint256) {
+        if (address(credentialVerifier) == address(0)) return 10000; // 1.0x baseline
+
+        bool[5] memory creds = credentialVerifier.getCredentials(user);
+        uint256 verifiedCount = 0;
+        for (uint8 i = 0; i < 5; i++) {
+            if (creds[i]) verifiedCount++;
+        }
+
+        // Each verified cred: +8% (800 basis points)
+        // All 5 verified: additional +120% (12000 basis points) combo bonus
+        uint256 multiplier = 10000 + (verifiedCount * 800);
+        if (verifiedCount == 5) multiplier += 12000;
+
+        return multiplier;
+    }
+
+    /**
+     * @notice Snapshot user's deposit balance for MAYE reward accrual.
+     *         Applies credential bonus multiplier from this lender's verification status.
+     */
+    function _recordDepositForReward(address user) internal {
+        if (address(mayeRewardToken) == address(0)) return;
+
+        uint256 depositBalance = deposits[user].amount;
+        uint256 multiplier = getRewardMultiplier(user);
+
+        // Scale USDC (6 decimals) to 18 decimals for MAYE math
+        uint256 scaledDeposit = depositBalance * 1e12;
+
+        // Apply multiplier (multiplier / 10000)
+        uint256 effectiveStake = (scaledDeposit * multiplier) / 10000;
+
+        mayeRewardToken.snapshotDeposit(user, effectiveStake);
     }
 }

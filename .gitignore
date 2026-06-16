@@ -43,6 +43,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Planning docs (internal)
+.planning/
+
 # Misc
 *.tsbuildinfo
 

@@ -6,7 +6,9 @@ import "../../contracts/BorrowerRegistry.sol";
 import "../../contracts/Tokens/mAYE.sol";
 import "../../contracts/Tokens/TestUSDC.sol";
 import "../../contracts/Tokens/bAYE.sol";
+import "../../contracts/Tokens/MAYEGov.sol";
 import "../../contracts/LendingPool.sol";
+import "../../contracts/CredentialVerifier.sol";
 
 /// @title Deploy — Deploys all Maye contracts to Base Sepolia
 /// @notice Run with:
@@ -16,8 +18,10 @@ contract Deploy is Script {
     BorrowerRegistry public borrowerRegistry;
     TestUSDC public testUSDC;
     MAYE public mayeToken;
+    MAYEGov public mayeGovToken;
     bAYE public debtToken;
     MayeLendingPool public lendingPool;
+    CredentialVerifier public credentialVerifier;
 
     function setUp() public {}
 
@@ -49,21 +53,36 @@ contract Deploy is Script {
         lendingPool = new MayeLendingPool(address(testUSDC), deployer);
         console.log("MayeLendingPool deployed at:", address(lendingPool));
 
-        // 6. Set up cross-contract references
+        // 6. Deploy Credential Verifier (using deployer as a mock TEE signer for now)
+        credentialVerifier = new CredentialVerifier(deployer, deployer);
+        console.log("CredentialVerifier deployed at:", address(credentialVerifier));
+
+        // 7. Deploy MAYEGov reward token
+        mayeGovToken = new MAYEGov(deployer, address(lendingPool));
+        console.log("MAYEGov Token deployed at:", address(mayeGovToken));
+
+        // 8. Set up cross-contract references
         lendingPool.setCreditOracle(address(borrowerRegistry));
         lendingPool.setDebtToken(address(debtToken));
+        lendingPool.setRewardToken(address(mayeGovToken));
+        lendingPool.setCredentialVerifier(address(credentialVerifier));
         debtToken.setLendingPool(address(lendingPool));
+        
+        // 9. Enable initial reward rate (e.g. 0.001 MAYE/s = 1e15 wei)
+        mayeGovToken.setRewardRate(1_000_000_000_000_000);
         
         console.log("Protocol logic linked and permissions set.");
 
         vm.stopBroadcast();
 
-        // 7. Log deployment summary
+        // 10. Log deployment summary
         console.log("\n=== Deployment Summary ===");
         console.log("TestUSDC:", address(testUSDC));
         console.log("BorrowerRegistry:", address(borrowerRegistry));
+        console.log("CredentialVerifier:", address(credentialVerifier));
         console.log("bAYE NFT:", address(debtToken));
-        console.log("mAYE Token:", address(mayeToken));
+        console.log("mAYE Receipt Token:", address(mayeToken));
+        console.log("MAYEGov Reward Token:", address(mayeGovToken));
         console.log("LendingPool:", address(lendingPool));
         console.log("==========================\n");
 
@@ -74,8 +93,10 @@ contract Deploy is Script {
             address(testUSDC)
         );
         json = vm.serializeAddress(json, "borrowerRegistry", address(borrowerRegistry));
+        json = vm.serializeAddress(json, "credentialVerifier", address(credentialVerifier));
         json = vm.serializeAddress(json, "bAYE", address(debtToken));
         json = vm.serializeAddress(json, "mAYE", address(mayeToken));
+        json = vm.serializeAddress(json, "mayeGovernance", address(mayeGovToken));
         json = vm.serializeAddress(json, "lendingPool", address(lendingPool));
         console.log("Deployment addresses:");
         console.log(json);

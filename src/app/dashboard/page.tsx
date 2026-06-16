@@ -19,11 +19,14 @@ import {
   Clock,
   Fingerprint,
   ShieldCheck,
-  Lock
+  Lock,
+  Sparkles
 } from "lucide-react";
 import { DashboardSummary } from "@/components/dashboard/DashboardSummary";
 import { DashboardStat } from "@/components/dashboard/DashboardStat";
 import { LoanPositionCard } from "@/components/dashboard/LoanPositionCard";
+import { useMayeRewards } from "@/hooks/useMayeRewards";
+import { MayeRewardHistory } from "@/components/dashboard/MayeRewardHistory";
 import { USDCLogo, ETHLogo, RLOLogo } from "@/components/icons";
 import { formatUSDC, formatRLO, timeAgo } from "@/lib/utils";
 
@@ -41,6 +44,9 @@ export default function DashboardPage() {
   const userLoans = pool.userLoans.data as bigint[] | undefined;
   const { summary } = usePortfolioSummary(userLoans);
   const liveCredentials = (pool.credentials.data as readonly boolean[]) || [false, false, false, false, false];
+
+  // MAYE Rewards
+  const { formatBalance: formatMayeBalance } = useMayeRewards(address as `0x${string}`);
 
   // ── Toast Notifications ──
   const { success: showSuccess, error: showError, pending: showPending } = useToast();
@@ -170,11 +176,62 @@ export default function DashboardPage() {
           
           {/* Main position stats and active loans */}
           <div className="lg:col-span-2 space-y-8">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <DashboardStat label="USDC Liquid Balance" value={`${usdcBalanceDisplay}`} subvalue="Repayment Token" icon={USDCLogo} />
-              <DashboardStat label="RLO Collateral Balance" value={`${rloBalanceDisplay}`} subvalue="Free in Wallet" icon={RLOLogo} />
-              <DashboardStat label="ETH Gas Balance" value={`${ethDisplay} ETH`} subvalue="Base Sepolia Gas" icon={ETHLogo} />
-            </div>
+            {/* Portfolio Vertical List */}
+            <Card className="border border-border/40 bg-[var(--glass-bg)] shadow-md backdrop-blur-sm relative overflow-hidden">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--color-sage-light)]/20 via-[var(--color-sage)]/40 to-[var(--color-sage-dark)]/20" />
+              <CardContent className="p-6 md:p-8">
+                <div className="flex items-center gap-2 mb-6">
+                  <Wallet className="size-4 text-[var(--color-sage-text)]" />
+                  <h4 className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground font-semibold">
+                    Your Portfolio
+                  </h4>
+                </div>
+                <div className="divide-y divide-border/30">
+                  <div className="flex items-center justify-between py-4">
+                    <div className="flex items-center gap-4">
+                      <div className="size-8"><USDCLogo /></div>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">USDC</p>
+                        <p className="text-[10px] font-mono text-muted-foreground/60 uppercase">Liquid Repayment Token</p>
+                      </div>
+                    </div>
+                    <span className="font-mono font-bold text-lg text-[var(--ink)]">{usdcBalanceDisplay}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-4">
+                    <div className="flex items-center gap-4">
+                      <div className="size-8"><RLOLogo /></div>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">RLO</p>
+                        <p className="text-[10px] font-mono text-muted-foreground/60 uppercase">Free Collateral Asset</p>
+                      </div>
+                    </div>
+                    <span className="font-mono font-bold text-lg text-[var(--ink)]">{rloBalanceDisplay}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-4">
+                    <div className="flex items-center gap-4">
+                      <div className="size-8 rounded-full bg-[var(--color-sage-light)]/20 text-[var(--color-sage-text)] border border-[var(--color-sage)]/30 flex items-center justify-center">
+                        <Sparkles className="size-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">MAYE</p>
+                        <p className="text-[10px] font-mono text-muted-foreground/60 uppercase">Governance Rewards</p>
+                      </div>
+                    </div>
+                    <span className="font-mono font-bold text-lg text-[var(--ink)]">{formatMayeBalance()}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-4">
+                    <div className="flex items-center gap-4">
+                      <div className="size-8"><ETHLogo /></div>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">ETH</p>
+                        <p className="text-[10px] font-mono text-muted-foreground/60 uppercase">Base Sepolia Gas</p>
+                      </div>
+                    </div>
+                    <span className="font-mono font-bold text-lg text-[var(--ink)]">{ethDisplay} ETH</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Active Borrowing positions */}
             <div className="space-y-6">
@@ -201,6 +258,11 @@ export default function DashboardPage() {
                   </Link>
                 </Card>
               )}
+            </div>
+
+            {/* MAYE Reward Claims History */}
+            <div className="pt-2">
+              <MayeRewardHistory />
             </div>
           </div>
 

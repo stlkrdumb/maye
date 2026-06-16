@@ -8,6 +8,8 @@ import { usePoolRead, usePoolWrite, usePoolWriteExtended } from "@/hooks/useCont
 import { formatUSDC, bpsToPercent } from "@/types/contracts";
 import { useToast } from "@/lib/providers/toast";
 import { StatBlock, TransactionCard, PositionCard } from "@/components/lend";
+import { MayeRewardCard } from "@/components/lend/MayeRewardCard";
+import { CredMultiplierBadge } from "@/components/lend/CredMultiplierBadge";
 import { Coins, Activity, TrendingUp, Wallet, CheckCircle } from "lucide-react";
 
 export default function LendPage() {
@@ -291,6 +293,16 @@ export default function LendPage() {
             projectedShare={projectedShare}
             utilization={utilization}
           />
+        </div>
+
+        {/* Rewards Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch fade-up" style={{ animationDelay: '150ms' }}>
+          <div className="lg:col-span-2">
+            <MayeRewardCard />
+          </div>
+          <div>
+            <CredMultiplierBadge userAddress={address as `0x${string}`} />
+          </div>
         </div>
 
         {/* Bottom Section: Features/Trust */}
