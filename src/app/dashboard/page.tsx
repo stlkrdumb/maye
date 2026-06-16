@@ -54,7 +54,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (faucets.rloHash) {
       if (faucets.isRloSuccess) {
-        showSuccess("RLO Minted!", "10,000 RLO collateral added to your wallet.", faucets.rloHash);
+        showSuccess("RLO Minted!", "200,000 RLO collateral added to your wallet.", faucets.rloHash);
       } else {
         showPending("Minting RLO Faucet", "Claiming test RLO from faucet...", faucets.rloHash);
       }
@@ -153,7 +153,7 @@ export default function DashboardPage() {
                   MINTING RLO...
                 </>
               ) : (
-                "FAUCET: 10K RLO"
+                "FAUCET: 200K RLO"
               )}
             </Button>
 

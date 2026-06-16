@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  */
 contract MockRLO is ERC20, Ownable {
     mapping(address => uint256) public lastFaucetRequest;
-    uint256 public constant FAUCET_AMOUNT = 1_000_000 * 10**18; // 1,000,000 RLO ($100k collateral value at $0.10)
+    uint256 public constant FAUCET_AMOUNT = 200_000 * 10**18; // 200k RLO ($20k collateral value at $0.10)
     uint256 public constant COOLDOWN = 24 hours;
 
     event FaucetRequested(address indexed user, uint256 amount);

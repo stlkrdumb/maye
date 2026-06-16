@@ -57,7 +57,7 @@ export async function POST(req: Request) {
       txHash = await walletClient.writeContract(request);
     } else {
       const rloAddress = CONTRACT_ADDRESSES[baseSepolia.id]?.mockRLO as `0x${string}`;
-      const amount = parseUnits("10000", 18); // 10k RLO (18 decimals)
+      const amount = parseUnits("200000", 18); // 200k RLO (18 decimals)
 
       const { request } = await publicClient.simulateContract({
         account,
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       token,
-      amount: token === "usdc" ? "50,000" : "10,000",
+      amount: token === "usdc" ? "50,000" : "200,000",
       txHash,
     });
   } catch (error) {

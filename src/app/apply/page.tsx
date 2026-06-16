@@ -79,7 +79,7 @@ export default function ApplyPage() {
   useEffect(() => {
     if (faucets.rloHash) {
       if (faucets.isRloSuccess) {
-        showSuccess("RLO Minted!", "10,000 RLO collateral added to your wallet.", faucets.rloHash);
+        showSuccess("RLO Minted!", "200,000 RLO collateral added to your wallet.", faucets.rloHash);
       } else {
         showPending("Minting RLO Faucet", "Claiming test RLO from faucet...", faucets.rloHash);
       }
@@ -89,7 +89,7 @@ export default function ApplyPage() {
   useEffect(() => {
     if (faucets.usdcHash) {
       if (faucets.isUsdcSuccess) {
-        showSuccess("USDC Minted!", "1,000 USDC added to your wallet.", faucets.usdcHash);
+        showSuccess("USDC Minted!", "50,000 USDC added to your wallet.", faucets.usdcHash);
       } else {
         showPending("Minting USDC Faucet", "Claiming test USDC from faucet...", faucets.usdcHash);
       }

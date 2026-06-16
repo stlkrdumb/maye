@@ -154,7 +154,7 @@ export function LoanTerms({
               onClick={() => faucets.requestRloFaucet()}
               className="h-8 px-4 font-mono text-[9px] uppercase tracking-widest bg-amber-600 hover:bg-amber-700 text-white shadow-sm shrink-0"
             >
-              {faucets.isMintingRlo ? "Minting..." : "Claim 10k RLO Faucet"}
+              {faucets.isMintingRlo ? "Minting..." : "Claim 200k RLO Faucet"}
             </Button>
           </div>
         ) : (
