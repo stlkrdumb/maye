@@ -131,11 +131,17 @@ export function LoanPositionCard({ loanId, userAddress }: LoanPositionCardProps)
     : 0;
 
   const currentUsdcAllowance = (poolRead.usdcAllowance.data as bigint) || 0n;
+  const usdcBalanceRaw = (poolRead.usdcBalance.data as bigint) || 0n;
   const needsApproval = repaymentRaw !== undefined && currentUsdcAllowance < repaymentRaw;
+  const isInsufficientUsdc = repaymentRaw !== undefined && usdcBalanceRaw < repaymentRaw;
 
   const handleRepayLoan = async () => {
     try {
       setRepaymentError(undefined);
+      if (isInsufficientUsdc) {
+        setRepaymentError(`Insufficient USDC balance. You need at least ${formatUSDC(repaymentRaw!)} USDC to repay.`);
+        return;
+      }
       if (needsApproval) {
         const buffer = parseUnits("10", 6);
         setLocalApproveHash(undefined);
@@ -252,21 +258,28 @@ export function LoanPositionCard({ loanId, userAddress }: LoanPositionCardProps)
                 <Button
                   size="sm"
                   onClick={handleRepayLoan}
-                  disabled={isLocalApproving || isLocalRepaying || repaymentConfirmed}
-                  className={`relative overflow-hidden h-11 px-6 font-mono text-[9px] uppercase tracking-widest shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 rounded-xl flex items-center gap-2 cursor-pointer ${
+                  disabled={isLocalApproving || isLocalRepaying || repaymentConfirmed || isInsufficientUsdc}
+                  className={`relative overflow-hidden h-11 px-6 font-mono text-[9px] uppercase tracking-widest shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 rounded-xl flex items-center gap-2 ${
                     repaymentConfirmed
                       ? "bg-emerald-600/90 text-white shadow-emerald-500/20"
                       : isLocalApproving || isLocalRepaying
                       ? "bg-muted/80 text-muted-foreground cursor-wait"
+                      : isInsufficientUsdc
+                      ? "bg-red-600/90 text-white shadow-red-500/20 opacity-80 cursor-not-allowed"
                       : repaymentError
                       ? "bg-red-600/90 text-white shadow-red-500/20"
-                      : "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-primary/20"
+                      : "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-primary/20 cursor-pointer"
                   }`}
                 >
                   {repaymentConfirmed ? (
                     <>
                       <ShieldCheck className="size-3.5" />
                       CONFIRMED
+                    </>
+                  ) : isInsufficientUsdc ? (
+                    <>
+                      <RefreshCw className="size-3.5" />
+                      INSUFFICIENT USDC
                     </>
                   ) : isLocalApproving ? (
                     <>
