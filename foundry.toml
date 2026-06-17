@@ -8,6 +8,8 @@ viaIR = true
 remappings = [
     "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
     "forge-std/=lib/forge-std/src/",
+    "uniswap-v2-core/=lib/uniswap-v2-core/contracts/",
+    "uniswap-v2-periphery/=lib/uniswap-v2-periphery/contracts/",
 ]
 
 # Base Sepolia deployment profile

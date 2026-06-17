@@ -8,7 +8,7 @@ dotenv.config();
 
 // ── Configuration ────────────────────────────────────────────────────────
 // 1. ADD YOUR UNISWAP PAIR ADDRESS HERE ONCE YOU CREATE THE POOL
-const UNISWAP_V2_PAIR_ADDRESS = "0x0000000000000000000000000000000000000000" as const; 
+const UNISWAP_V2_PAIR_ADDRESS = "0xc3DC372117B7c75d069DD7151Af8aD57685e7B1E" as const; 
 
 // 2. The RialoLendingPool address that needs to be updated
 const RIALO_LENDING_POOL = "0x008633b8E4Dc1Ede02A8AA23B45854f40c4426e2" as const; // Your live Rialo Pool
@@ -36,9 +36,10 @@ const walletClient = createWalletClient({
 
 // ── ABIs ─────────────────────────────────────────────────────────────────
 const pairAbi = parseAbi([
-  "function getReserves() external view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)",
-  "function token0() external view returns (address)",
-  "function token1() external view returns (address)"
+  "function reserveA() external view returns (uint256)",
+  "function reserveB() external view returns (uint256)",
+  "function T0() external view returns (address)",
+  "function T1() external view returns (address)"
 ]);
 
 const lendingPoolAbi = parseAbi([
@@ -49,7 +50,7 @@ const lendingPoolAbi = parseAbi([
 // ── Bot Logic ────────────────────────────────────────────────────────────
 
 async function fetchAndSyncPrice() {
-  if (UNISWAP_V2_PAIR_ADDRESS === "0x0000000000000000000000000000000000000000") {
+  if ((UNISWAP_V2_PAIR_ADDRESS as string) === "0x0000000000000000000000000000000000000000") {
     console.error("❌ ERROR: Please add your UNISWAP_V2_PAIR_ADDRESS in scripts/price-updater-bot.ts first.");
     process.exit(1);
   }
@@ -61,14 +62,20 @@ async function fetchAndSyncPrice() {
     const token0 = await publicClient.readContract({
       address: UNISWAP_V2_PAIR_ADDRESS,
       abi: pairAbi,
-      functionName: "token0",
+      functionName: "T0",
     });
 
     // 2. Get reserves
-    const [reserve0, reserve1] = await publicClient.readContract({
+    const reserve0 = await publicClient.readContract({
       address: UNISWAP_V2_PAIR_ADDRESS,
       abi: pairAbi,
-      functionName: "getReserves",
+      functionName: "reserveA",
+    });
+    
+    const reserve1 = await publicClient.readContract({
+      address: UNISWAP_V2_PAIR_ADDRESS,
+      abi: pairAbi,
+      functionName: "reserveB",
     });
 
     // Assuming we pair RLO (18 decimals) with USDC (6 decimals)

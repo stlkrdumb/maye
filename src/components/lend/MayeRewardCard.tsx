@@ -12,13 +12,22 @@ import { MAYELogo } from "@/components/icons";
 export function MayeRewardCard() {
   const { address, isConnected } = useAccount();
   const { success: showSuccess, pending: showPending, error: showError } = useToast();
-  const { claimable, rate, isClaiming, claim, formatRate } = useMayeRewards(address);
+  const { claimable, rate, isClaiming, claim, formatRate, lastSnapshotDeposit } = useMayeRewards(address);
 
   if (!isConnected) return null;
 
   // Let's format the claimable rewards
   const claimableDisplay = parseFloat(formatUnits(claimable || 0n, 18));
-  const hourlyEstimate = rate ? parseFloat(formatUnits(rate || 0n, 18)) * 3600 : 0;
+  
+  const hasDeposit = lastSnapshotDeposit && lastSnapshotDeposit > 0n;
+  const activeRate = rate || 0n;
+
+  // If user has deposit: use their snapshot deposit balance.
+  // Otherwise, fallback to a baseline of $1,000 USDC (with 1.0x multiplier = 1000 * 10^18 scaled)
+  const referenceDeposit = hasDeposit ? lastSnapshotDeposit : (1000n * 10n**18n);
+
+  const ratePerSec = (referenceDeposit * activeRate) / 10n**18n;
+  const hourlyEstimate = parseFloat(formatUnits(ratePerSec * 3600n, 18));
 
   async function handleClaim() {
     try {
@@ -64,18 +73,18 @@ export function MayeRewardCard() {
         <div className="grid grid-cols-2 gap-4 pt-2 border-t border-border/30">
           <div>
             <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground flex items-center gap-1">
-              <Clock className="size-3" /> Reward Rate
+              <Clock className="size-3" /> {hasDeposit ? "My Rate" : "Rate (per $1k)"}
             </p>
             <p className="text-xs font-mono mt-0.5 text-[var(--ink)]">
-              {rate ? `${parseFloat(formatUnits(rate, 18)).toFixed(8)}/s` : "—"}
+              {rate ? `${parseFloat(formatUnits(ratePerSec, 18)).toFixed(4)}/s` : "—"}
             </p>
           </div>
           <div>
             <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground flex items-center gap-1">
-              <TrendingUp className="size-3" /> Est. Hourly
+              <TrendingUp className="size-3" /> {hasDeposit ? "Est. Hourly" : "Est. (per $1k)"}
             </p>
             <p className="text-xs font-mono mt-0.5 text-[var(--ink)]">
-              {hourlyEstimate > 0 ? `+${hourlyEstimate.toFixed(4)}` : "—"}
+              {hourlyEstimate > 0 ? `+${hourlyEstimate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—"}
             </p>
           </div>
         </div>

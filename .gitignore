@@ -49,3 +49,5 @@ pnpm-debug.log*
 # Misc
 *.tsbuildinfo
 
+.agents/
+skills-lock.json

@@ -11,6 +11,7 @@ const MAYE_GOVERNANCE_ADDRESS = getContractAddress(baseSepolia.id, "mayeGovernan
 export function useMayeRewards(userAddress?: `0x${string}`) {
   // Read pending rewards (computed on-chain)
   const pendingQuery = useReadContract({
+    chainId: baseSepolia.id,
     address: MAYE_GOVERNANCE_ADDRESS,
     abi: MAYEGovABI,
     functionName: "getPendingAt",
@@ -23,6 +24,7 @@ export function useMayeRewards(userAddress?: `0x${string}`) {
 
   // Read already accrued (checkpointed) rewards
   const accruedQuery = useReadContract({
+    chainId: baseSepolia.id,
     address: MAYE_GOVERNANCE_ADDRESS,
     abi: MAYEGovABI,
     functionName: "rewardsAccrued",
@@ -35,6 +37,7 @@ export function useMayeRewards(userAddress?: `0x${string}`) {
 
   // Read current global reward rate
   const rateQuery = useReadContract({
+    chainId: baseSepolia.id,
     address: MAYE_GOVERNANCE_ADDRESS,
     abi: MAYEGovABI,
     functionName: "rewardRatePerSecond",
@@ -43,6 +46,7 @@ export function useMayeRewards(userAddress?: `0x${string}`) {
 
   // Read rewards enabled status
   const enabledQuery = useReadContract({
+    chainId: baseSepolia.id,
     address: MAYE_GOVERNANCE_ADDRESS,
     abi: MAYEGovABI,
     functionName: "rewardsEnabled",
@@ -51,9 +55,23 @@ export function useMayeRewards(userAddress?: `0x${string}`) {
 
   // Read user's MAYE token balance
   const balanceQuery = useReadContract({
+    chainId: baseSepolia.id,
     address: MAYE_GOVERNANCE_ADDRESS,
     abi: MAYEGovABI,
     functionName: "balanceOf",
+    args: userAddress ? [userAddress] : undefined,
+    query: { 
+      enabled: !!userAddress,
+      refetchInterval: 30_000,
+    },
+  });
+
+  // Read user's tracked deposit balance at last snapshot (scaled to 18 decimals)
+  const depositQuery = useReadContract({
+    chainId: baseSepolia.id,
+    address: MAYE_GOVERNANCE_ADDRESS,
+    abi: MAYEGovABI,
+    functionName: "lastSnapshotDeposit",
     args: userAddress ? [userAddress] : undefined,
     query: { 
       enabled: !!userAddress,
@@ -103,10 +121,9 @@ export function useMayeRewards(userAddress?: `0x${string}`) {
     enabled: enabledQuery.data,
     balance: balanceQuery.data as bigint | undefined,
     
-    // Derived
-    claimable: (pendingQuery.data && accruedQuery.data) 
-      ? (pendingQuery.data as bigint) - (accruedQuery.data as bigint) 
-      : 0n,
+    // Derived (total claimable is getPendingAt which includes accrued + pending)
+    claimable: pendingQuery.data ? (pendingQuery.data as bigint) : 0n,
+    lastSnapshotDeposit: depositQuery.data as bigint | undefined,
     
     // State
     isClaiming,

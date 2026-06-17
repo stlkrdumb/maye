@@ -17,6 +17,9 @@ export const CONTRACT_ADDRESSES: Record<number, Partial<ContractAddresses>> = {
     credentialVerifier: "0xC4b57f451f510437Aac43093E96eE73b3D86C3bf",
     bAYE: "0x1c17740478ebfc1c50eb48B540FAC533F67df019",
     mayeGovernance: "0xD63A89A014f37c229E25d2fb85c88a3479e50583",
+    mayeDexPair: "0xc3DC372117B7c75d069DD7151Af8aD57685e7B1E",
+    mayeDexRouter: "0x5aAE8eDa362a256b80290F525DAdD341D2ea3A2B",
+    mayeDexFactory: "0x5e56Dd90d44637baF2C65bc4E80909F0DC6A5cF2",
   },
 };
 
@@ -30,6 +33,9 @@ export interface ContractAddresses {
   borrowerRegistry: string;
   bAYE: string;
   mayeGovernance: string;
+  mayeDexPair: string;
+  mayeDexRouter: string;
+  mayeDexFactory: string;
 }
 
 export function getContractAddress(chainId: number, name: keyof ContractAddresses): string {

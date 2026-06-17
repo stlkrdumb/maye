@@ -578,6 +578,13 @@ export const MAYEGovABI = [
     type: "function",
   },
   {
+    inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "lastSnapshotDeposit",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [{ internalType: "uint256", name: "newRate", type: "uint256" }],
     name: "setRewardRate",
     outputs: [],
