@@ -128,9 +128,16 @@ export function useMayeRewards(userAddress?: `0x${string}`) {
     // State
     isClaiming,
     isClaimConfirmed: isClaimConfirmed.data?.status === "success",
+    claimHash: hash,
     
     // Actions
     claim,
+    refetch: () => {
+      pendingQuery.refetch();
+      accruedQuery.refetch();
+      balanceQuery.refetch();
+      depositQuery.refetch();
+    },
     
     // Formatters
     formatPending: () => formatReward(pendingQuery.data as bigint | undefined),

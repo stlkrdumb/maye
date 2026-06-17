@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { formatUnits } from "viem";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,32 @@ import { MAYELogo } from "@/components/icons";
 export function MayeRewardCard() {
   const { address, isConnected } = useAccount();
   const { success: showSuccess, pending: showPending, error: showError } = useToast();
-  const { claimable, rate, isClaiming, claim, formatRate, lastSnapshotDeposit } = useMayeRewards(address);
+  const { 
+    claimable, 
+    rate, 
+    isClaiming, 
+    claim, 
+    formatRate, 
+    lastSnapshotDeposit,
+    claimHash,
+    isClaimConfirmed,
+    refetch
+  } = useMayeRewards(address);
+
+  const [localClaimHash, setLocalClaimHash] = useState<`0x${string}` | undefined>(undefined);
+
+  // Watch Claim confirmations
+  useEffect(() => {
+    if (claimHash && localClaimHash && claimHash === localClaimHash) {
+      if (isClaimConfirmed) {
+        showSuccess("Rewards Claimed!", "MAYE tokens successfully minted to your wallet.", claimHash);
+        setLocalClaimHash(undefined);
+        refetch();
+      } else {
+        showPending("Claiming MAYE", "Minting governance rewards on-chain...", claimHash);
+      }
+    }
+  }, [claimHash, isClaimConfirmed, localClaimHash]);
 
   if (!isConnected) return null;
 
@@ -32,8 +58,10 @@ export function MayeRewardCard() {
   async function handleClaim() {
     try {
       console.log("[Rewards] Starting claim tx...");
+      setLocalClaimHash(undefined);
       const txHash = await claim();
       console.log("[Rewards] Claim tx submitted:", txHash);
+      setLocalClaimHash(txHash);
       showPending("Claiming MAYE", "Minting governance rewards on-chain...", txHash);
     } catch (err) {
       const error = err as Error;
