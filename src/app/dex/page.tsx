@@ -9,6 +9,12 @@ import { ArrowDown, RefreshCw, Wallet, Settings2, ChevronDown } from "lucide-rea
 import { USDCLogo, RLOLogo, MAYELogo } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { getContractAddress } from "@/lib/contracts/addresses";
 import { baseSepolia } from "viem/chains";
 
@@ -75,8 +81,6 @@ export default function DexPage() {
   const [toToken, setToToken] = useState<TokenID>("usdc");
   const [amountIn, setAmountIn] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isFromOpen, setIsFromOpen] = useState(false);
-  const [isToOpen, setIsToOpen] = useState(false);
 
   // Watch Approval Status
   useEffect(() => {
@@ -252,10 +256,8 @@ export default function DexPage() {
                 }}
                 className="w-full bg-transparent border-none outline-none text-3xl font-mono text-foreground placeholder:text-muted-foreground/30 py-2 focus:ring-0"
               />
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setIsFromOpen(!isFromOpen)}
+              <DropdownMenu>
+                <DropdownMenuTrigger
                   className="flex items-center gap-2 bg-background/50 border border-border/50 text-foreground text-sm font-semibold rounded-xl px-3 py-2 outline-none cursor-pointer hover:bg-background transition-colors select-none whitespace-nowrap min-w-[110px] justify-between"
                 >
                   <div className="flex items-center gap-2">
@@ -263,36 +265,29 @@ export default function DexPage() {
                     <span>{TOKENS[fromToken].symbol}</span>
                   </div>
                   <ChevronDown size={14} className="text-muted-foreground" />
-                </button>
-                {isFromOpen && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setIsFromOpen(false)} />
-                    <div className="absolute right-0 mt-2 w-48 bg-background border border-border/60 rounded-xl shadow-lg py-1 z-50 animate-in fade-in slide-in-from-top-1 duration-100">
-                      {Object.values(TOKENS).map((t) => (
-                        <button
-                          key={t.id}
-                          type="button"
-                          onClick={() => {
-                            const newFrom = t.id;
-                            if (newFrom === toToken) handleSwapTokens();
-                            else setFromToken(newFrom);
-                            setIsFromOpen(false);
-                          }}
-                          className={`w-full flex items-center gap-3 px-4 py-2 text-left text-sm hover:bg-muted/50 transition-colors ${
-                            fromToken === t.id ? "bg-muted/30 font-medium" : ""
-                          }`}
-                        >
-                          <TokenIcon symbol={t.symbol} className="size-5" />
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-foreground text-xs leading-none mb-0.5">{t.symbol}</span>
-                            <span className="text-[10px] text-muted-foreground leading-none">{t.name}</span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-background border border-border/60 rounded-xl p-1 shadow-lg z-50">
+                  {Object.values(TOKENS).map((t) => (
+                    <DropdownMenuItem
+                      key={t.id}
+                      onClick={() => {
+                        const newFrom = t.id;
+                        if (newFrom === toToken) handleSwapTokens();
+                        else setFromToken(newFrom);
+                      }}
+                      className={`flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-muted/50 rounded-lg transition-colors ${
+                        fromToken === t.id ? "bg-muted/30 font-medium" : ""
+                      }`}
+                    >
+                      <TokenIcon symbol={t.symbol} className="size-5" />
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-semibold text-foreground text-xs leading-none">{t.symbol}</span>
+                        <span className="text-[10px] text-muted-foreground leading-none">{t.name}</span>
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
@@ -324,10 +319,8 @@ export default function DexPage() {
                 readOnly
                 className="w-full bg-transparent border-none outline-none text-3xl font-mono text-foreground/80 placeholder:text-muted-foreground/30 py-2 focus:ring-0 cursor-not-allowed"
               />
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setIsToOpen(!isToOpen)}
+              <DropdownMenu>
+                <DropdownMenuTrigger
                   className="flex items-center gap-2 bg-background/50 border border-border/50 text-foreground text-sm font-semibold rounded-xl px-3 py-2 outline-none cursor-pointer hover:bg-background transition-colors select-none whitespace-nowrap min-w-[110px] justify-between"
                 >
                   <div className="flex items-center gap-2">
@@ -335,36 +328,29 @@ export default function DexPage() {
                     <span>{TOKENS[toToken].symbol}</span>
                   </div>
                   <ChevronDown size={14} className="text-muted-foreground" />
-                </button>
-                {isToOpen && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setIsToOpen(false)} />
-                    <div className="absolute right-0 mt-2 w-48 bg-background border border-border/60 rounded-xl shadow-lg py-1 z-50 animate-in fade-in slide-in-from-top-1 duration-100">
-                      {Object.values(TOKENS).map((t) => (
-                        <button
-                          key={t.id}
-                          type="button"
-                          onClick={() => {
-                            const newTo = t.id;
-                            if (newTo === fromToken) handleSwapTokens();
-                            else setToToken(newTo);
-                            setIsToOpen(false);
-                          }}
-                          className={`w-full flex items-center gap-3 px-4 py-2 text-left text-sm hover:bg-muted/50 transition-colors ${
-                            toToken === t.id ? "bg-muted/30 font-medium" : ""
-                          }`}
-                        >
-                          <TokenIcon symbol={t.symbol} className="size-5" />
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-foreground text-xs leading-none mb-0.5">{t.symbol}</span>
-                            <span className="text-[10px] text-muted-foreground leading-none">{t.name}</span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-background border border-border/60 rounded-xl p-1 shadow-lg z-50">
+                  {Object.values(TOKENS).map((t) => (
+                    <DropdownMenuItem
+                      key={t.id}
+                      onClick={() => {
+                        const newTo = t.id;
+                        if (newTo === fromToken) handleSwapTokens();
+                        else setToToken(newTo);
+                      }}
+                      className={`flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-muted/50 rounded-lg transition-colors ${
+                        toToken === t.id ? "bg-muted/30 font-medium" : ""
+                      }`}
+                    >
+                      <TokenIcon symbol={t.symbol} className="size-5" />
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-semibold text-foreground text-xs leading-none">{t.symbol}</span>
+                        <span className="text-[10px] text-muted-foreground leading-none">{t.name}</span>
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
