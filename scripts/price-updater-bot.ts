@@ -8,7 +8,7 @@ dotenv.config();
 
 // ── Configuration ────────────────────────────────────────────────────────
 // 1. ADD YOUR UNISWAP PAIR ADDRESS HERE ONCE YOU CREATE THE POOL
-const UNISWAP_V2_PAIR_ADDRESS = "0xc3DC372117B7c75d069DD7151Af8aD57685e7B1E" as const; 
+const UNISWAP_V2_PAIR_ADDRESS = "0xA4c37A50188bc8B3828555e68Fb90ec2F545d862" as const; 
 
 // 2. The RialoLendingPool address that needs to be updated
 const RIALO_LENDING_POOL = "0x008633b8E4Dc1Ede02A8AA23B45854f40c4426e2" as const; // Your live Rialo Pool

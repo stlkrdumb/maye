@@ -26,7 +26,7 @@ const wagmiConfig = getDefaultConfig({
   appName: "Maye — Consumer Lending Portal",
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "your-walletconnect-id",
   chains: [customBaseSepolia],
-  ssr: true,
+  ssr: false,
 });
 
 const queryClient = new QueryClient({

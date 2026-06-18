@@ -45,6 +45,7 @@
     --radius-lg: 12px;
 
     /* ---- Typography ---- */
+    --font-sans: "General Sans", "Inter", system-ui, -apple-system, sans-serif;
     --font-display: "Suisse Intl", "Newsreader", serif;
     --font-body: "General Sans", "Inter", sans-serif;
     --font-mono: "JetBrains Mono", monospace;

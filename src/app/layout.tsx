@@ -4,10 +4,7 @@ import { WalletProvider } from "@/lib/providers/wallet";
 import { ThemeProvider } from "@/lib/providers/theme";
 import { ToastProvider } from "@/lib/providers/toast";
 import { Header } from "@/components/layout/Header";
-import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: "Maye — Dynamic Under-Collateralized Lending",
@@ -21,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)} suppressHydrationWarning>
+    <html lang="en" className={cn("font-sans")} suppressHydrationWarning>
       <body className="min-h-[100dvh]">
         {/* Skip to main content for keyboard/screen reader users */}
         <a

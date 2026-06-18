@@ -46,7 +46,8 @@ export function Header() {
           {[
             { href: "/lend", label: "Lend" },
             { href: "/apply", label: "Borrow" },
-            { href: "/dashboard", label: "Dashboard" }
+            { href: "/dashboard", label: "Dashboard" },
+            { href: "/dex", label: "DEX" }
           ].map((link) => (
             <Link 
               key={link.href} 
